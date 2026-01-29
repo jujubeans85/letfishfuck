@@ -1,13 +1,14 @@
-<!doctype html><!doctype html>
+<!doctype html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LETFISHFUCK — Music</title>
-  <meta name="description" content="Music — sketches, drafts, stems, loops. Quiet confidence. Loud output." />
+
+  <meta name="description" content="Music — sketches, demos, loops. Quiet confidence. Loud output. Politely unhinged, professionally useful." />
   <meta name="theme-color" content="#0b0b0c" />
   <meta property="og:title" content="LETFISHFUCK — Music" />
-  <meta property="og:description" content="Sketches, drafts, loops. Politely unhinged, professionally useful." />
+  <meta property="og:description" content="Sketches, demos, loops. Quiet confidence. Loud output." />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="../assets/hero.jpg" />
 
@@ -41,20 +42,20 @@
       <div class="section-head">
         <h2>Music</h2>
         <p class="muted">
-          Audio-first. Drop files to preview — then store the keepers in <code>/assets</code>.
-          Name them like <code>work-01.mp3</code>, <code>work-02.wav</code> etc.
+          Audio-first. Drop files to preview — then store keepers in <code>/assets</code>.
+          Name them like <code>work-01.mp3</code>, <code>work-02.wav</code>… (or <code>work-01.pdf</code> for notes).
         </p>
       </div>
 
       <div class="mini">
-        <span class="pill">MP3 / WAV</span>
-        <span class="pill">Quick previews</span>
+        <span class="pill">MP3 / WAV / M4A</span>
+        <span class="pill">Optional PDFs</span>
         <span class="pill hot">Less talk, more sound</span>
       </div>
 
       <!-- Drag + drop preview -->
       <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio files here or click to select">
-        <input id="filePicker" type="file" multiple accept="audio/*,.mp3,.wav,.m4a,.aif,.aiff,.flac,.pdf" />
+        <input id="filePicker" type="file" multiple accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.aif,.aiff,.pdf" />
         <div class="dz-inner">
           <div class="dz-title">Drop audio here</div>
           <div class="dz-sub">MP3 / WAV / M4A • quick preview cards</div>
@@ -64,13 +65,13 @@
 
       <div class="grid" id="previews" aria-live="polite"></div>
 
-      <!-- Real hosted files (placeholders) -->
+      <!-- Hosted placeholders -->
       <div class="panel" style="margin-top:18px;">
         <div class="section-head">
           <h2 style="font-size:22px; margin:0;">Hosted tracks (assets)</h2>
           <p class="muted">
-            Drop audio into <code>/assets/work-01.mp3</code>, <code>/assets/work-02.wav</code> etc.
-            If a file doesn’t exist yet, the player will just look empty — no drama.
+            Put files in <code>/assets</code>. Examples:
+            <code>assets/work-01.mp3</code>, <code>assets/work-02.wav</code>, <code>assets/work-03.m4a</code>.
           </p>
         </div>
 
@@ -84,9 +85,10 @@
               <audio controls preload="metadata" style="width:100%;">
                 <source src="../assets/work-01.mp3" type="audio/mpeg" />
                 <source src="../assets/work-01.wav" type="audio/wav" />
+                <source src="../assets/work-01.m4a" type="audio/mp4" />
               </audio>
             </div>
-            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-01.mp3</code> (or .wav)</div>
+            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-01.mp3</code> (or .wav/.m4a)</div>
           </div>
 
           <div class="preview">
@@ -98,9 +100,10 @@
               <audio controls preload="metadata" style="width:100%;">
                 <source src="../assets/work-02.mp3" type="audio/mpeg" />
                 <source src="../assets/work-02.wav" type="audio/wav" />
+                <source src="../assets/work-02.m4a" type="audio/mp4" />
               </audio>
             </div>
-            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-02.mp3</code> (or .wav)</div>
+            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-02.mp3</code> (or .wav/.m4a)</div>
           </div>
 
           <div class="preview">
@@ -112,9 +115,10 @@
               <audio controls preload="metadata" style="width:100%;">
                 <source src="../assets/work-03.mp3" type="audio/mpeg" />
                 <source src="../assets/work-03.wav" type="audio/wav" />
+                <source src="../assets/work-03.m4a" type="audio/mp4" />
               </audio>
             </div>
-            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-03.mp3</code> (or .wav)</div>
+            <div class="muted small" style="margin-top:10px;">Put file in <code>/assets/work-03.mp3</code> (or .wav/.m4a)</div>
           </div>
         </div>
 
@@ -132,125 +136,7 @@
     </footer>
   </main>
 
-  <!-- NEW page-specific JS -->
-  <script src="./music.js" defer></script>
-</body>
-</html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LETFISHFUCK — Music</title>
-  <meta name="description" content="Music — demos, sketches, loops. Politely unhinged, professionally useful." />
-  <meta name="theme-color" content="#0b0b0c" />
-  <meta property="og:title" content="LETFISHFUCK — Music" />
-  <meta property="og:description" content="Demos, sketches, loops. Quiet confidence. Loud output." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="../assets/hero.jpg" />
-
-  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="../styles.css" />
-</head>
-
-<body>
-  <a class="skip" href="#main">Skip to content</a>
-
-  <header class="topbar">
-    <div class="brand">
-      <div class="mark">&gt;&lt;(((°&gt;</div>
-      <div class="wordmark">
-        <div class="title">LETFISHFUCK</div>
-        <div class="sub">aka Mimi Marsh</div>
-      </div>
-    </div>
-
-    <nav class="nav" aria-label="Primary">
-      <a href="/">Home</a>
-      <a href="/work">Work</a>
-      <a href="/about">About</a>
-      <a href="/contact">Contact</a>
-      <button class="mode" id="modeBtn" type="button" aria-label="Toggle theme">⚡</button>
-    </nav>
-  </header>
-
-  <main id="main" class="wrap">
-    <section class="section">
-      <div class="section-head">
-        <h2>Music</h2>
-        <p class="muted">
-          Audio sketches, demos, loops. Drop files to preview — then put the keepers into <code>/assets</code>.
-        </p>
-      </div>
-
-      <div class="mini">
-        <span class="pill">MP3 / WAV</span>
-        <span class="pill">Quick listens</span>
-        <span class="pill hot">No fluff</span>
-      </div>
-
-      <!-- Drag + drop preview -->
-      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop audio files here or click to select">
-        <input id="filePicker" type="file" multiple accept="audio/*,.mp3,.wav,.m4a" />
-        <div class="dz-inner">
-          <div class="dz-title">Drop audio here</div>
-          <div class="dz-sub">MP3 / WAV • quick preview cards</div>
-          <div class="dz-tip">Tip: iPad → Files app → select files → drag into Safari</div>
-        </div>
-      </div>
-
-      <div class="grid" id="previews" aria-live="polite"></div>
-
-      <!-- Real hosted files (placeholders) -->
-      <div class="section" style="padding-top:18px;">
-        <div class="section-head">
-          <h2 style="font-size:22px; margin:0;">Hosted tracks (assets)</h2>
-          <p class="muted">Rename your files like <code>assets/work-01.mp3</code>, <code>assets/work-02.wav</code>, etc.</p>
-        </div>
-
-        <div class="grid">
-          <div class="preview">
-            <div class="meta">
-              <div class="name">work-01</div>
-              <div class="type">audio</div>
-            </div>
-            <div class="thumb" style="padding:10px;">
-              <audio controls preload="none" src="../assets/work-01.mp3"></audio>
-            </div>
-          </div>
-
-          <div class="preview">
-            <div class="meta">
-              <div class="name">work-02</div>
-              <div class="type">audio</div>
-            </div>
-            <div class="thumb" style="padding:10px;">
-              <audio controls preload="none" src="../assets/work-02.mp3"></audio>
-            </div>
-          </div>
-
-          <div class="preview">
-            <div class="meta">
-              <div class="name">work-03</div>
-              <div class="type">audio</div>
-            </div>
-            <div class="thumb" style="padding:10px;">
-              <audio controls preload="none" src="../assets/work-03.wav"></audio>
-            </div>
-          </div>
-        </div>
-
-        <p class="micro" style="margin-top:10px;">
-          “If it slaps, it ships.” <span class="muted">(polite chaos, clean delivery)</span>
-        </p>
-      </div>
-
-      <footer class="footer">
-        <div class="footer-left">© Mimi • built under neon rain</div>
-        <div class="footer-right">☮️</div>
-      </footer>
-    </section>
-  </main>
-
-  <script src="../script.js"></script>
+  <!-- Root shared JS -->
+  <script src="../script.js" defer></script>
 </body>
 </html>
