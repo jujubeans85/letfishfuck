@@ -37,7 +37,7 @@
   </header>
 
   <main id="main" class="wrap">
-    <section class="section">
+    <section class="section" aria-label="Media">
       <div class="section-head">
         <h2>Media</h2>
         <p class="muted">
@@ -65,7 +65,7 @@
       <div class="grid" id="previews" aria-live="polite"></div>
 
       <!-- Real hosted files (placeholders) -->
-      <div class="section" style="padding-top:18px;">
+      <div class="panel" style="margin-top:18px;">
         <div class="section-head">
           <h2 style="font-size:22px; margin:0;">Hosted clips (assets)</h2>
           <p class="muted">Rename like <code>assets/media-01.mp4</code>, <code>assets/media-02.mp4</code>…</p>
@@ -75,31 +75,40 @@
           <div class="preview">
             <div class="meta">
               <div class="name">media-01</div>
-              <div class="type">video</div>
+              <div class="type">mp4</div>
             </div>
             <div class="thumb" style="padding:10px;">
-              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-01.mp4"></video>
+              <video controls preload="metadata" playsinline muted style="width:100%; border-radius:14px;">
+                <source src="../assets/media-01.mp4" type="video/mp4" />
+              </video>
             </div>
+            <div class="muted small" style="margin-top:10px;">Drop file into <code>/assets/media-01.mp4</code></div>
           </div>
 
           <div class="preview">
             <div class="meta">
               <div class="name">media-02</div>
-              <div class="type">video</div>
+              <div class="type">mp4</div>
             </div>
             <div class="thumb" style="padding:10px;">
-              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-02.mp4"></video>
+              <video controls preload="metadata" playsinline muted style="width:100%; border-radius:14px;">
+                <source src="../assets/media-02.mp4" type="video/mp4" />
+              </video>
             </div>
+            <div class="muted small" style="margin-top:10px;">Drop file into <code>/assets/media-02.mp4</code></div>
           </div>
 
           <div class="preview">
             <div class="meta">
               <div class="name">media-03</div>
-              <div class="type">video</div>
+              <div class="type">mp4</div>
             </div>
             <div class="thumb" style="padding:10px;">
-              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-03.mp4"></video>
+              <video controls preload="metadata" playsinline muted style="width:100%; border-radius:14px;">
+                <source src="../assets/media-03.mp4" type="video/mp4" />
+              </video>
             </div>
+            <div class="muted small" style="margin-top:10px;">Drop file into <code>/assets/media-03.mp4</code></div>
           </div>
         </div>
 
@@ -107,14 +116,15 @@
           “Need someone calm, switched on, and dangerous in the ideas?” <span class="muted">That’s me.</span>
         </p>
       </div>
-
-      <footer class="footer">
-        <div class="footer-left">© Mimi • built under neon rain</div>
-        <div class="footer-right">☮️</div>
-      </footer>
     </section>
+
+    <footer class="footer">
+      <div class="footer-left">© Mimi • built under neon rain</div>
+      <div class="footer-right">☮️</div>
+    </footer>
   </main>
 
-  <script src="../script.js"></script>
+  <!-- NEW page-specific JS -->
+  <script src="./media.js" defer></script>
 </body>
 </html>
