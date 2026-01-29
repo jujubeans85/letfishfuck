@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LETFISHFUCK — Media</title>
+  <meta name="description" content="Media — short clips, reels, process footage. Politely unhinged, professionally useful." />
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta property="og:title" content="LETFISHFUCK — Media" />
+  <meta property="og:description" content="Short clips, reels, process footage. Quiet confidence. Loud output." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="../assets/hero.jpg" />
+
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">&gt;&lt;(((°&gt;</div>
+      <div class="wordmark">
+        <div class="title">LETFISHFUCK</div>
+        <div class="sub">aka Mimi Marsh</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="/work">Work</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <button class="mode" id="modeBtn" type="button" aria-label="Toggle theme">⚡</button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="section">
+      <div class="section-head">
+        <h2>Media</h2>
+        <p class="muted">
+          Short clips (MP4). Drop files to preview — then store the keepers in <code>/assets</code>.
+          Keep it ~30s so it loads fast and hits hard.
+        </p>
+      </div>
+
+      <div class="mini">
+        <span class="pill">MP4</span>
+        <span class="pill">Up to ~30s</span>
+        <span class="pill hot">Show, don’t talk</span>
+      </div>
+
+      <!-- Drag + drop preview -->
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop video files here or click to select">
+        <input id="filePicker" type="file" multiple accept="video/mp4,.mp4,video/*" />
+        <div class="dz-inner">
+          <div class="dz-title">Drop MP4s here</div>
+          <div class="dz-sub">MP4 • quick preview cards</div>
+          <div class="dz-tip">Tip: iPad → Files app → select files → drag into Safari</div>
+        </div>
+      </div>
+
+      <div class="grid" id="previews" aria-live="polite"></div>
+
+      <!-- Real hosted files (placeholders) -->
+      <div class="section" style="padding-top:18px;">
+        <div class="section-head">
+          <h2 style="font-size:22px; margin:0;">Hosted clips (assets)</h2>
+          <p class="muted">Rename like <code>assets/media-01.mp4</code>, <code>assets/media-02.mp4</code>…</p>
+        </div>
+
+        <div class="grid">
+          <div class="preview">
+            <div class="meta">
+              <div class="name">media-01</div>
+              <div class="type">video</div>
+            </div>
+            <div class="thumb" style="padding:10px;">
+              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-01.mp4"></video>
+            </div>
+          </div>
+
+          <div class="preview">
+            <div class="meta">
+              <div class="name">media-02</div>
+              <div class="type">video</div>
+            </div>
+            <div class="thumb" style="padding:10px;">
+              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-02.mp4"></video>
+            </div>
+          </div>
+
+          <div class="preview">
+            <div class="meta">
+              <div class="name">media-03</div>
+              <div class="type">video</div>
+            </div>
+            <div class="thumb" style="padding:10px;">
+              <video controls preload="metadata" playsinline style="width:100%; border-radius:14px;" src="../assets/media-03.mp4"></video>
+            </div>
+          </div>
+        </div>
+
+        <p class="micro" style="margin-top:10px;">
+          “Need someone calm, switched on, and dangerous in the ideas?” <span class="muted">That’s me.</span>
+        </p>
+      </div>
+
+      <footer class="footer">
+        <div class="footer-left">© Mimi • built under neon rain</div>
+        <div class="footer-right">☮️</div>
+      </footer>
+    </section>
+  </main>
+
+  <script src="../script.js"></script>
+</body>
+</html>
