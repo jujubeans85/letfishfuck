@@ -11,7 +11,7 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# Cache assets hard (images/audio)
+# Cache assets hard (images/audio/video)
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -23,8 +23,40 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# If someone hits /work etc, serve index (SPA-ish niceness)
+# Pretty URLs -> on-page sections
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  from = "/work"
+  to = "/#work"
+  status = 301
+
+[[redirects]]
+  from = "/about"
+  to = "/#about"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/#contact"
+  status = 301
+
+# Extra shortcuts
+[[redirects]]
+  from = "/music"
+  to = "/#work"
+  status = 301
+
+[[redirects]]
+  from = "/media"
+  to = "/#work"
+  status = 301
+
+# PDF shortcuts (root is the canonical copy)
+[[redirects]]
+  from = "/.pdf"
+  to = "/PORTFOLIO.pdf"
+  status = 301
+
+[[redirects]]
+  from = "/pdf"
+  to = "/PORTFOLIO.pdf"
+  status = 301
