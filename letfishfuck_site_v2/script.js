@@ -1,175 +1,218 @@
-/* LETFISHFUCK v2 — keep it simple, ship it */
-(function () {
-  const $ = (sel, root = document) => root.querySelector(sel);
+(() => {
+  const $ = (sel, el = document) => el.querySelector(sel);
 
-  // Theme
+  // ---------------------------
+  // Theme toggle
+  // ---------------------------
   const modeBtn = $("#modeBtn");
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
+  const root = document.documentElement;
 
-  modeBtn?.addEventListener("click", () => {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
-    const next = current === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem("theme", next);
-    toast(next === "dark" ? "Dark mode" : "Light mode");
-  });
+  function setTheme(next) {
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch {}
+  }
+  function getTheme() {
+    try { return localStorage.getItem("theme"); } catch { return null; }
+  }
+  const saved = getTheme();
+  if (saved) setTheme(saved);
 
-  // Copy helpers
-  const SITE_URL = "https://letfishfuck.netlify.app/";
-  const EMAIL = "arts-internships-info@unimelb.edu.au";
-
-  $("#copyLink")?.addEventListener("click", async () => {
-    await copyToClipboard(SITE_URL);
-    toast("Copied site link");
-  });
-
-  $("#copyEmail")?.addEventListener("click", async () => {
-    await copyToClipboard(EMAIL);
-    toast("Copied email");
-  });
-
-  async function copyToClipboard(text) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      // iOS fallback
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      ta.style.position = "fixed";
-      ta.style.left = "-9999px";
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      ta.remove();
-    }
+  if (modeBtn) {
+    modeBtn.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme") || "dark";
+      setTheme(current === "dark" ? "light" : "dark");
+    });
   }
 
-  // Toast
-  const toastEl = $("#toast");
-  let toastTimer = null;
-  function toast(msg) {
-    if (!toastEl) return;
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1400);
+  // ---------------------------
+  // Helpers
+  // ---------------------------
+  const previewsEl = $("#previews");
+
+  function ext(name) {
+    const i = name.lastIndexOf(".");
+    return i >= 0 ? name.slice(i + 1).toLowerCase() : "";
   }
 
-  // Drag & drop previews
-  const dz = $("#dropzone");
-  const picker = $("#filePicker");
-  const previews = $("#previews");
+  function typeFromExt(e) {
+    if (["jpg", "jpeg", "png", "webp", "gif"].includes(e)) return "image";
+    if (["mp3", "wav", "m4a", "aac", "ogg"].includes(e)) return "audio";
+    if (["mp4", "mov", "webm"].includes(e)) return "video";
+    if (["pdf"].includes(e)) return "pdf";
+    return "file";
+  }
 
-  const addFiles = (fileList) => {
-    if (!previews) return;
-    [...fileList].forEach((file) => previews.appendChild(makePreviewCard(file)));
-    toast("Added preview cards");
-  };
+  function niceType(t) {
+    if (t === "image") return "Image";
+    if (t === "audio") return "Audio";
+    if (t === "video") return "Video";
+    if (t === "pdf") return "PDF";
+    return "File";
+  }
 
-  dz?.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dz.classList.add("dragover");
-  });
-  dz?.addEventListener("dragleave", () => dz.classList.remove("dragover"));
-  dz?.addEventListener("drop", (e) => {
-    e.preventDefault();
-    dz.classList.remove("dragover");
-    if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
-  });
+  function cardHTML({ name, url, kind }) {
+    const safeName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const typeLabel = niceType(kind);
 
-  dz?.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      picker?.click();
-    }
-  });
-
-  picker?.addEventListener("change", (e) => {
-    const files = e.target.files;
-    if (files?.length) addFiles(files);
-    picker.value = "";
-  });
-
-  function makePreviewCard(file) {
-    const card = document.createElement("div");
-    card.className = "preview";
-
-    const meta = document.createElement("div");
-    meta.className = "meta";
-
-    const left = document.createElement("div");
-    const name = document.createElement("div");
-    name.className = "name";
-    name.textContent = file.name;
-
-    const type = document.createElement("div");
-    type.className = "type";
-    type.textContent = humanType(file);
-
-    left.appendChild(name);
-    left.appendChild(type);
-
-    const right = document.createElement("button");
-    right.className = "x";
-    right.type = "button";
-    right.textContent = "Remove";
-    right.addEventListener("click", () => card.remove());
-
-    meta.appendChild(left);
-    meta.appendChild(right);
-
-    const thumb = document.createElement("div");
-    thumb.className = "thumb";
-
-    // Render
-    if (file.type.startsWith("image/")) {
-      const img = document.createElement("img");
-      img.alt = file.name;
-      img.loading = "lazy";
-      img.src = URL.createObjectURL(file);
-      thumb.appendChild(img);
-    } else if (file.type.startsWith("audio/")) {
-      const audio = document.createElement("audio");
-      audio.controls = true;
-      audio.src = URL.createObjectURL(file);
-      thumb.appendChild(audio);
-    } else if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
-      const iframe = document.createElement("iframe");
-      iframe.title = file.name;
-      iframe.src = URL.createObjectURL(file);
-      thumb.appendChild(iframe);
+    let body = "";
+    if (kind === "image") {
+      body = `<div class="thumb"><img src="${url}" alt="${safeName}"></div>`;
+    } else if (kind === "audio") {
+      body = `<div class="thumb" style="padding:10px"><audio controls src="${url}"></audio></div>`;
+    } else if (kind === "video") {
+      body = `<div class="thumb" style="padding:10px"><video controls style="width:100%" src="${url}"></video></div>`;
+    } else if (kind === "pdf") {
+      body = `<div class="thumb" style="padding:12px">
+        <a class="btn" href="${url}" target="_blank" rel="noreferrer">Open PDF</a>
+      </div>`;
     } else {
-      const p = document.createElement("div");
-      p.style.padding = "14px";
-      p.style.color = "var(--muted)";
-      p.textContent = "Preview not supported — keep it, we’ll place it tomorrow.";
-      thumb.appendChild(p);
+      body = `<div class="thumb" style="padding:12px">
+        <a class="btn" href="${url}" target="_blank" rel="noreferrer">Open file</a>
+      </div>`;
     }
 
-    card.appendChild(meta);
-    card.appendChild(thumb);
-
-    const actions = document.createElement("div");
-    actions.className = "actions";
-
-    const open = document.createElement("a");
-    open.className = "btn ghost";
-    open.href = URL.createObjectURL(file);
-    open.target = "_blank";
-    open.rel = "noopener";
-    open.textContent = "Open";
-
-    actions.appendChild(open);
-    card.appendChild(actions);
-
-    return card;
+    return `
+      <div class="preview">
+        <div class="meta">
+          <div>
+            <div class="name">${safeName}</div>
+            <div class="type">${typeLabel}</div>
+          </div>
+          <a class="btn small" href="${url}" target="_blank" rel="noreferrer">Open</a>
+        </div>
+        ${body}
+      </div>
+    `;
   }
 
-  function humanType(file) {
-    if (file.type.startsWith("image/")) return "Image";
-    if (file.type.startsWith("audio/")) return "Audio";
-    if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) return "PDF";
-    return file.type ? file.type : "File";
+  function renderCards(items) {
+    if (!previewsEl) return;
+    previewsEl.innerHTML = items.map(cardHTML).join("");
   }
+
+  // ---------------------------
+  // Auto-detect assets (no directory listing in static hosting)
+  // We try common filenames, and only render what exists.
+  // ---------------------------
+  const PAGE_MODE = window.PAGE_MODE || "all"; // "music" | "media" | "all"
+
+  const CANDIDATES = (() => {
+    const out = [];
+
+    // image/video/audio slots
+    for (let i = 1; i <= 24; i++) {
+      const n = String(i).padStart(2, "0");
+      out.push(`work-${n}.jpg`, `work-${n}.jpeg`, `work-${n}.png`, `work-${n}.webp`);
+      out.push(`work-${n}.mp3`, `work-${n}.wav`, `work-${n}.m4a`);
+      out.push(`work-${n}.mp4`, `work-${n}.mov`, `work-${n}.webm`);
+      out.push(`work-${n}.pdf`);
+    }
+
+    // portfolio locations (root + assets)
+    out.push(`PORTFOLIO.pdf`);
+    out.push(`assets/PORTFOLIO.pdf`);
+
+    // hero
+    out.push(`assets/hero.jpg`, `assets/hero.png`, `assets/hero.webp`);
+
+    return out;
+  })();
+
+  function allowed(kind) {
+    if (PAGE_MODE === "music") return kind === "audio";
+    if (PAGE_MODE === "media") return kind === "image" || kind === "video";
+    return true;
+  }
+
+  async function exists(url) {
+    try {
+      const res = await fetch(url, { method: "HEAD" });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }
+
+  async function detectAndRender() {
+    if (!previewsEl) return;
+
+    const found = [];
+
+    // only check likely ones for the page mode
+    const filteredCandidates = CANDIDATES.filter((p) => {
+      const e = ext(p);
+      const k = typeFromExt(e);
+      return allowed(k);
+    });
+
+    // limit concurrent checks so mobile Safari doesn’t explode
+    const CONCURRENCY = 6;
+    let idx = 0;
+
+    async function worker() {
+      while (idx < filteredCandidates.length) {
+        const i = idx++;
+        const path = filteredCandidates[i];
+        const url = path.startsWith("assets/") ? `/${path}` : `/${path}`;
+
+        const ok = await exists(url);
+        if (ok) {
+          const name = path.split("/").pop();
+          const k = typeFromExt(ext(path));
+          found.push({ name, url, kind: k });
+        }
+      }
+    }
+
+    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+
+    // Sort: work-xx first, then PORTFOLIO, then hero
+    found.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+    if (found.length === 0) {
+      previewsEl.innerHTML = `
+        <div class="note">
+          <div class="big">Nothing detected yet.</div>
+          <div class="muted">Drop files into <code>/assets</code> using <code>work-01.jpg</code>, <code>work-01.mp3</code>, <code>work-01.mp4</code>… then refresh.</div>
+        </div>
+      `;
+      return;
+    }
+
+    renderCards(found);
+  }
+
+  // ---------------------------
+  // Drag + drop preview (local only)
+  // ---------------------------
+  function bindDropzone() {
+    const dz = $(".dropzone") || $(".panel"); // fallback for /music /media pages
+    if (!dz || !previewsEl) return;
+
+    function handleFiles(fileList) {
+      const items = [];
+      for (const f of fileList) {
+        const e = ext(f.name);
+        const k = typeFromExt(e);
+        if (!allowed(k)) continue;
+
+        const url = URL.createObjectURL(f);
+        items.push({ name: f.name, url, kind: k });
+      }
+      if (items.length) renderCards(items);
+    }
+
+    // global drop
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
+    });
+  }
+
+  // ---------------------------
+  // Go
+  // ---------------------------
+  detectAndRender();
+  bindDropzone();
 })();
