@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LETFISHFUCK — Mimi Marsh</title>
-  <meta name="description" content="Interactive Composition • Music Production • Sound Design • DJ • Multi‑instrumentalist. Quiet confidence. Loud output." />
+  <meta name="description" content="Interactive Composition • Music Production • Sound Design • DJ • Multi-instrumentalist. Quiet confidence. Loud output." />
   <meta name="theme-color" content="#0b0b0c" />
   <meta property="og:title" content="LETFISHFUCK — Mimi Marsh" />
   <meta property="og:description" content="Quiet confidence. Loud output. Politely unhinged. Professionally useful." />
@@ -17,9 +17,10 @@
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
+  <!-- TOP BAR -->
   <header class="topbar">
     <div class="brand">
-      <div class="mark" aria-hidden="true">><(((°></div>
+      <div class="mark">&gt;&lt;(((°&gt;</div>
       <div class="wordmark">
         <div class="title">LETFISHFUCK</div>
         <div class="sub">aka Mimi Marsh</div>
@@ -27,9 +28,12 @@
     </div>
 
     <nav class="nav" aria-label="Primary">
-      <a href="#work">Work</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
+      <a href="/work">Work</a>
+      <a href="/about">About</a>
+      <a href="/contact">Contact</a>
+      <a href="/music/">Music</a>
+      <a href="/media/">Media</a>
+      <a href="/pdf">PDF</a>
       <button class="mode" id="modeBtn" type="button" aria-label="Toggle theme">⚡</button>
     </nav>
   </header>
@@ -50,10 +54,13 @@
           I don’t need babysitting — I need access.
         </p>
 
+        <!-- HERO CTA (single source of truth) -->
         <div class="cta-row">
-          <a class="btn primary" href="#work">See work</a>
-          <a class="btn ghost" href="PORTFOLIO.pdf" target="_blank" rel="noopener">Open PDF</a>
-          <a class="btn ghost" href="#contact">Contact</a>
+          <a class="btn primary" href="/work">See work</a>
+          <a class="btn" href="/pdf">Open PDF</a>
+          <a class="btn ghost" href="/contact">Contact</a>
+          <a class="btn" href="/music/">Music</a>
+          <a class="btn" href="/media/">Media</a>
         </div>
 
         <div class="mini">
@@ -75,7 +82,8 @@
       <div class="hero-right">
         <figure class="card hero-card">
           <div class="hero-img">
-            <img src="assets/hero.jpg" alt="Portrait / hero image" loading="lazy" onerror="this.closest('.hero-img').classList.add('missing')" />
+            <img src="assets/hero.jpg" alt="Portrait / hero image" loading="lazy"
+                 onerror="this.closest('.hero-img').classList.add('missing')" />
             <div class="hero-fallback">
               Drop an image into <code>/assets/hero.jpg</code>
             </div>
@@ -100,10 +108,10 @@
       </div>
 
       <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop files here or click to select">
-        <input id="filePicker" type="file" multiple accept="image/*,audio/*,.pdf" />
+        <input id="filePicker" type="file" multiple accept="image/*,audio/*,video/*,.pdf" />
         <div class="dz-inner">
           <div class="dz-title">Drop files here</div>
-          <div class="dz-sub">Images / audio / PDFs • quick preview cards</div>
+          <div class="dz-sub">Images / audio / video / PDFs • quick preview cards</div>
           <div class="dz-tip">Tip: iPad → Files app → select files → drag into Safari</div>
         </div>
       </div>
@@ -113,7 +121,7 @@
       <div class="work-notes">
         <div class="note">
           <strong>Quick placeholders:</strong>
-          <div class="muted">Drop an image in <code>assets/work-01.jpg</code> etc. Add audio as <code>.mp3</code>. PDFs as <code>.pdf</code>.</div>
+          <div class="muted">Drop an image in <code>assets/work-01.jpg</code> etc. Add audio as <code>.mp3</code> or <code>.wav</code>. Video as <code>.mp4</code>. PDFs as <code>.pdf</code>.</div>
         </div>
         <div class="note">
           <strong>Sketchbook / Sound diary</strong>
@@ -135,9 +143,9 @@
         <div class="panel">
           <h3>What I do</h3>
           <p>
-            I study Interactive Composition at the University of Melbourne — an industry‑focused degree where I develop
+            I study Interactive Composition at the University of Melbourne — an industry-focused degree where I develop
             commercially relevant skills in music production, sound design, and music technology.
-            Through project‑based learning and cross‑disciplinary collaboration, I work in studio environments and ship real work.
+            Through project-based learning and cross-disciplinary collaboration, I work in studio environments and ship real work.
           </p>
           <p class="muted">
             I’m surrounded by musicians daily, and can connect with / support emerging artists as needed.
