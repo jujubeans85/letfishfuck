@@ -4,8 +4,8 @@
   // ---------------------------
   // Theme toggle
   // ---------------------------
-  const modeBtn = $("#modeBtn");
   const root = document.documentElement;
+  const modeBtn = $("#modeBtn");
 
   function setTheme(next) {
     root.setAttribute("data-theme", next);
@@ -14,8 +14,9 @@
   function getTheme() {
     try { return localStorage.getItem("theme"); } catch { return null; }
   }
+
   const saved = getTheme();
-  if (saved) setTheme(saved);
+  if (saved === "dark" || saved === "light") setTheme(saved);
 
   if (modeBtn) {
     modeBtn.addEventListener("click", () => {
@@ -25,9 +26,23 @@
   }
 
   // ---------------------------
+  // Page mode auto-detect
+  // ---------------------------
+  // root page: /
+  // music page: /music/
+  // media page: /media/
+  const path = (location.pathname || "/").toLowerCase();
+  const PAGE_MODE =
+    path.includes("/music") ? "music" :
+    path.includes("/media") ? "media" :
+    "all";
+
+  // ---------------------------
   // Helpers
   // ---------------------------
   const previewsEl = $("#previews");
+  const dropzone = $("#dropzone");
+  const filePicker = $("#filePicker");
 
   function ext(name) {
     const i = name.lastIndexOf(".");
@@ -36,10 +51,16 @@
 
   function typeFromExt(e) {
     if (["jpg", "jpeg", "png", "webp", "gif"].includes(e)) return "image";
-    if (["mp3", "wav", "m4a", "aac", "ogg"].includes(e)) return "audio";
+    if (["mp3", "wav", "m4a", "aac", "ogg", "flac", "aif", "aiff"].includes(e)) return "audio";
     if (["mp4", "mov", "webm"].includes(e)) return "video";
-    if (["pdf"].includes(e)) return "pdf";
+    if (e === "pdf") return "pdf";
     return "file";
+  }
+
+  function allowed(kind) {
+    if (PAGE_MODE === "music") return kind === "audio" || kind === "pdf";
+    if (PAGE_MODE === "media") return kind === "video" || kind === "image";
+    return true;
   }
 
   function niceType(t) {
@@ -50,17 +71,28 @@
     return "File";
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function cardHTML({ name, url, kind }) {
-    const safeName = name.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const safeName = escapeHtml(name);
     const typeLabel = niceType(kind);
 
     let body = "";
     if (kind === "image") {
-      body = `<div class="thumb"><img src="${url}" alt="${safeName}"></div>`;
+      body = `<div class="thumb"><img src="${url}" alt="${safeName}" loading="lazy"></div>`;
     } else if (kind === "audio") {
-      body = `<div class="thumb" style="padding:10px"><audio controls src="${url}"></audio></div>`;
+      body = `<div class="thumb" style="padding:10px"><audio controls preload="metadata" src="${url}"></audio></div>`;
     } else if (kind === "video") {
-      body = `<div class="thumb" style="padding:10px"><video controls style="width:100%" src="${url}"></video></div>`;
+      body = `<div class="thumb" style="padding:10px">
+        <video controls playsinline muted preload="metadata" style="width:100%; border-radius:14px;" src="${url}"></video>
+      </div>`;
     } else if (kind === "pdf") {
       body = `<div class="thumb" style="padding:12px">
         <a class="btn" href="${url}" target="_blank" rel="noreferrer">Open PDF</a>
@@ -91,42 +123,38 @@
   }
 
   // ---------------------------
-  // Auto-detect assets (no directory listing in static hosting)
-  // We try common filenames, and only render what exists.
+  // Asset detection
+  // (static hosting can't list directories — we probe likely filenames)
   // ---------------------------
-  const PAGE_MODE = window.PAGE_MODE || "all"; // "music" | "media" | "all"
-
+  // We support both naming styles:
+  //  - work-01.mp3 / work-01.jpg / work-01.mp4
+  //  - media-01.mp4 for media page
   const CANDIDATES = (() => {
     const out = [];
 
-    // image/video/audio slots
+    // common numbered slots
     for (let i = 1; i <= 24; i++) {
       const n = String(i).padStart(2, "0");
-      out.push(`work-${n}.jpg`, `work-${n}.jpeg`, `work-${n}.png`, `work-${n}.webp`);
-      out.push(`work-${n}.mp3`, `work-${n}.wav`, `work-${n}.m4a`);
-      out.push(`work-${n}.mp4`, `work-${n}.mov`, `work-${n}.webm`);
-      out.push(`work-${n}.pdf`);
+
+      // work-xx.*
+      out.push(`assets/work-${n}.jpg`, `assets/work-${n}.jpeg`, `assets/work-${n}.png`, `assets/work-${n}.webp`);
+      out.push(`assets/work-${n}.mp3`, `assets/work-${n}.wav`, `assets/work-${n}.m4a`);
+      out.push(`assets/work-${n}.mp4`, `assets/work-${n}.mov`, `assets/work-${n}.webm`);
+      out.push(`assets/work-${n}.pdf`);
+
+      // media-xx.mp4 (media page)
+      out.push(`assets/media-${n}.mp4`, `assets/media-${n}.mov`, `assets/media-${n}.webm`);
     }
 
-    // portfolio locations (root + assets)
-    out.push(`PORTFOLIO.pdf`);
-    out.push(`assets/PORTFOLIO.pdf`);
-
-    // hero
-    out.push(`assets/hero.jpg`, `assets/hero.png`, `assets/hero.webp`);
+    // portfolio locations
+    out.push(`PORTFOLIO.pdf`, `assets/PORTFOLIO.pdf`);
 
     return out;
   })();
 
-  function allowed(kind) {
-    if (PAGE_MODE === "music") return kind === "audio";
-    if (PAGE_MODE === "media") return kind === "image" || kind === "video";
-    return true;
-  }
-
   async function exists(url) {
     try {
-      const res = await fetch(url, { method: "HEAD" });
+      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
       return res.ok;
     } catch {
       return false;
@@ -137,23 +165,17 @@
     if (!previewsEl) return;
 
     const found = [];
+    const filtered = CANDIDATES.filter((p) => allowed(typeFromExt(ext(p))));
 
-    // only check likely ones for the page mode
-    const filteredCandidates = CANDIDATES.filter((p) => {
-      const e = ext(p);
-      const k = typeFromExt(e);
-      return allowed(k);
-    });
-
-    // limit concurrent checks so mobile Safari doesn’t explode
+    // keep it sane on mobile Safari
     const CONCURRENCY = 6;
     let idx = 0;
 
     async function worker() {
-      while (idx < filteredCandidates.length) {
+      while (idx < filtered.length) {
         const i = idx++;
-        const path = filteredCandidates[i];
-        const url = path.startsWith("assets/") ? `/${path}` : `/${path}`;
+        const path = filtered[i];
+        const url = path.startsWith("/") ? path : `/${path}`;
 
         const ok = await exists(url);
         if (ok) {
@@ -166,14 +188,16 @@
 
     await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
-    // Sort: work-xx first, then PORTFOLIO, then hero
     found.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
     if (found.length === 0) {
       previewsEl.innerHTML = `
         <div class="note">
           <div class="big">Nothing detected yet.</div>
-          <div class="muted">Drop files into <code>/assets</code> using <code>work-01.jpg</code>, <code>work-01.mp3</code>, <code>work-01.mp4</code>… then refresh.</div>
+          <div class="muted">
+            Drop files into <code>/assets</code> using
+            <code>work-01.mp3</code>, <code>work-01.mp4</code>, <code>work-01.jpg</code>… then refresh.
+          </div>
         </div>
       `;
       return;
@@ -183,30 +207,54 @@
   }
 
   // ---------------------------
-  // Drag + drop preview (local only)
+  // Drag + drop preview (LOCAL only)
   // ---------------------------
   function bindDropzone() {
-    const dz = $(".dropzone") || $(".panel"); // fallback for /music /media pages
-    if (!dz || !previewsEl) return;
+    if (!dropzone || !previewsEl) return;
 
     function handleFiles(fileList) {
       const items = [];
       for (const f of fileList) {
-        const e = ext(f.name);
-        const k = typeFromExt(e);
+        const k = typeFromExt(ext(f.name));
         if (!allowed(k)) continue;
-
         const url = URL.createObjectURL(f);
         items.push({ name: f.name, url, kind: k });
       }
       if (items.length) renderCards(items);
     }
 
-    // global drop
-    window.addEventListener("dragover", (e) => e.preventDefault());
-    window.addEventListener("drop", (e) => {
+    function setDragOver(on) {
+      dropzone.classList.toggle("dragover", !!on);
+    }
+
+    dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
+      setDragOver(true);
+    });
+
+    dropzone.addEventListener("dragleave", () => setDragOver(false));
+
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      setDragOver(false);
       if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
+    });
+
+    // click-to-pick if present
+    if (filePicker) {
+      dropzone.addEventListener("click", () => filePicker.click());
+      filePicker.addEventListener("change", (e) => {
+        if (e.target.files?.length) handleFiles(e.target.files);
+        filePicker.value = "";
+      });
+    }
+
+    // keyboard accessibility
+    dropzone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        filePicker?.click();
+      }
     });
   }
 
