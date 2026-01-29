@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LETFISHFUCK — Mimi Marsh</title>
+  <meta name="description" content="Interactive Composition • Music Production • Sound Design • DJ • Multi‑instrumentalist. Quiet confidence. Loud output." />
+  <meta name="theme-color" content="#0b0b0c" />
+  <meta property="og:title" content="LETFISHFUCK — Mimi Marsh" />
+  <meta property="og:description" content="Quiet confidence. Loud output. Politely unhinged. Professionally useful." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="assets/hero.jpg" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">><(((°></div>
+      <div class="wordmark">
+        <div class="title">LETFISHFUCK</div>
+        <div class="sub">aka Mimi Marsh</div>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <button class="mode" id="modeBtn" type="button" aria-label="Toggle theme">⚡</button>
+    </nav>
+  </header>
+
+  <main id="main" class="wrap">
+    <section class="hero" aria-label="Intro">
+      <div class="hero-left">
+        <p class="kicker">Interactive Composition • Music Production • Sound Design • DJ • Multi-instrumentalist</p>
+
+        <h1 class="h1">
+          Quiet confidence.<br />
+          Loud output.
+        </h1>
+
+        <p class="lede">
+          Conservatorium-trained saxophonist (2024). Bass player. DJ. Drummer.
+          <span class="nowrap">Ableton-native.</span> Studio-gear fluent.
+          I don’t need babysitting — I need access.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn primary" href="#work">See work</a>
+          <a class="btn ghost" href="PORTFOLIO.pdf" target="_blank" rel="noopener">Open PDF</a>
+          <a class="btn ghost" href="#contact">Contact</a>
+        </div>
+
+        <div class="mini">
+          <span class="pill">Scotland Island / Pittwater</span>
+          <span class="pill">Works near Sydney Harbour Bridge</span>
+          <span class="pill hot">Internship: March 2026</span>
+        </div>
+
+        <ul class="bullets">
+          <li><strong>Useful in the room</strong> while I learn fast.</li>
+          <li><strong>Dangerous in the ideas.</strong></li>
+          <li><strong>Give me a task</strong> — I’ll bring it back finished.</li>
+        </ul>
+
+        <p class="toilets">I’ll scrub toilets with a smile!</p>
+        <p class="micro">“Artist-with-a-backbone energy.” <span class="muted">(politely unhinged, professionally useful)</span></p>
+      </div>
+
+      <div class="hero-right">
+        <figure class="card hero-card">
+          <div class="hero-img">
+            <img src="assets/hero.jpg" alt="Portrait / hero image" loading="lazy" onerror="this.closest('.hero-img').classList.add('missing')" />
+            <div class="hero-fallback">
+              Drop an image into <code>/assets/hero.jpg</code>
+            </div>
+          </div>
+
+          <div class="hero-meta">
+            <div class="chip-row">
+              <span class="chip">DJ / Production / Sound</span>
+              <span class="chip subtle">Available: Tue–Thu (Uni)</span>
+              <span class="chip subtle">Flexible outside hours</span>
+            </div>
+            <div class="small muted">2nd year @ UniMelb • Ableton-native ✅</div>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <section id="work" class="section">
+      <div class="section-head">
+        <h2>Work</h2>
+        <p class="muted">Drag files into the drop zone to preview a layout. Tomorrow we “properly” place them in <code>/assets</code>.</p>
+      </div>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Drop files here or click to select">
+        <input id="filePicker" type="file" multiple accept="image/*,audio/*,.pdf" />
+        <div class="dz-inner">
+          <div class="dz-title">Drop files here</div>
+          <div class="dz-sub">Images / audio / PDFs • quick preview cards</div>
+          <div class="dz-tip">Tip: iPad → Files app → select files → drag into Safari</div>
+        </div>
+      </div>
+
+      <div class="grid" id="previews" aria-live="polite"></div>
+
+      <div class="work-notes">
+        <div class="note">
+          <strong>Quick placeholders:</strong>
+          <div class="muted">Drop an image in <code>assets/work-01.jpg</code> etc. Add audio as <code>.mp3</code>. PDFs as <code>.pdf</code>.</div>
+        </div>
+        <div class="note">
+          <strong>Sketchbook / Sound diary</strong>
+          <div class="muted">Messy process. Clean results.</div>
+        </div>
+        <div class="note">
+          <strong>Ableton Field/Room Studio</strong>
+          <div class="muted">Fast hands. Faster brain. Less talking.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="section-head">
+        <h2>About</h2>
+      </div>
+
+      <div class="two">
+        <div class="panel">
+          <h3>What I do</h3>
+          <p>
+            I study Interactive Composition at the University of Melbourne — an industry‑focused degree where I develop
+            commercially relevant skills in music production, sound design, and music technology.
+            Through project‑based learning and cross‑disciplinary collaboration, I work in studio environments and ship real work.
+          </p>
+          <p class="muted">
+            I’m surrounded by musicians daily, and can connect with / support emerging artists as needed.
+          </p>
+        </div>
+
+        <div class="panel">
+          <h3>Gear / skills</h3>
+          <ul class="list">
+            <li>Ableton Live • sampling • arrangement • mix prep</li>
+            <li>Sax • bass • drums • DJ workflows</li>
+            <li>Studio routing • interfaces • comfortable on hardware</li>
+          </ul>
+
+          <div class="badge-row">
+            <span class="badge">Fast learner</span>
+            <span class="badge">Calm under pressure</span>
+            <span class="badge">Gets it finished</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <div class="section-head">
+        <h2>Contact <span class="muted">(make it stupid-easy to say yes)</span></h2>
+      </div>
+
+      <div class="contact">
+        <div class="panel">
+          <p class="big">Make it easy to say yes.</p>
+          <div class="contact-row">
+            <a class="btn primary" href="mailto:arts-internships-info@unimelb.edu.au?subject=MULT20010%20Arts%20Internship%20Host%20-%20Mimi%20Marsh">Email</a>
+            <button class="btn ghost" id="copyLink" type="button">Copy site link</button>
+            <button class="btn ghost" id="copyEmail" type="button">Copy email</button>
+          </div>
+          <p class="muted small">(Add Insta / SoundCloud / Mixcloud tomorrow)</p>
+        </div>
+
+        <div class="panel">
+          <h3>Availability</h3>
+          <div class="muted">
+            Tue 9am–12pm • Wed 9am–11am (break) 2pm–4pm • Thu 10am–1pm<br />
+            Outside those hours: available all day / all night <span class="muted">(within reason — I’m not a vampire, just efficient)</span>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="muted">
+            UniMelb • MULT20010 • March 2026 start
+          </div>
+        </div>
+      </div>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-left">© Mimi • built under neon rain</div>
+      <div class="footer-right">☮️</div>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
