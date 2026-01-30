@@ -25,8 +25,8 @@
 
 # Pretty URLs -> on-page sections
 [[redirects]]
-  from = "/work"
-  to = "/#work"
+  from = "/enter"
+  to = "/work"
   status = 301
 
 [[redirects]]
