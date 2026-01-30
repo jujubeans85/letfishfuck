@@ -145,7 +145,6 @@
       await navigator.clipboard.writeText(text);
       return true;
     } catch {
-      // fallback
       try {
         const ta = document.createElement("textarea");
         ta.value = text;
@@ -172,7 +171,6 @@
 
   if (copyEmailBtn) {
     copyEmailBtn.addEventListener("click", async () => {
-      // If you later add a visible email element, swap this.
       const email = "arts-internships-info@unimelb.edu.au";
       const ok = await copyToClipboard(email);
       toast(ok ? "Email copied ✅" : "Couldn’t copy email 😵");
@@ -195,20 +193,15 @@
     const nn = String(n).padStart(2, "0");
     const out = [];
 
-    // audio/pdf (music + root)
     out.push(`assets/work-${nn}.mp3`, `assets/work-${nn}.wav`, `assets/work-${nn}.m4a`);
     out.push(`assets/work-${nn}.pdf`);
 
-    // images (root + media)
     out.push(`assets/work-${nn}.jpg`, `assets/work-${nn}.jpeg`, `assets/work-${nn}.png`, `assets/work-${nn}.webp`);
 
-    // video (root + media)
     out.push(`assets/work-${nn}.mp4`, `assets/work-${nn}.mov`, `assets/work-${nn}.webm`);
 
-    // media-xx videos (media page)
     out.push(`assets/media-${nn}.mp4`, `assets/media-${nn}.mov`, `assets/media-${nn}.webm`);
 
-    // filter by PAGE_MODE
     return out.filter((p) => allowed(typeFromExt(ext(p))));
   }
 
@@ -217,12 +210,11 @@
 
     const found = [];
 
-    // Always try portfolio first
     const portfolioCandidates = [`/PORTFOLIO.pdf`, `/assets/PORTFOLIO.pdf`];
     for (const u of portfolioCandidates) {
       if (allowed("pdf") && (await exists(u))) {
         found.push({ name: u.split("/").pop(), url: u, kind: "pdf" });
-        break; // root copy is canonical; stop after first hit
+        break;
       }
     }
 
@@ -232,8 +224,6 @@
 
     for (let i = 1; i <= MAX_SLOTS; i++) {
       const candidates = slotCandidates(i);
-
-      // probe this slot: if ANY exists, record all that exist (for this slot)
       let hit = false;
 
       for (const p of candidates) {
@@ -247,7 +237,6 @@
       if (hit) dead = 0;
       else dead++;
 
-      // stop early when it's clearly over (after at least a few attempts)
       if (i >= 6 && dead >= DEAD_STREAK_STOP) break;
     }
 
@@ -289,7 +278,6 @@
       dropzone.classList.toggle("dragover", !!on);
     }
 
-    // Prevent Safari from opening dragged files as navigation
     window.addEventListener("dragover", (e) => e.preventDefault());
     window.addEventListener("drop", (e) => e.preventDefault());
 
@@ -321,8 +309,30 @@
   }
 
   // ---------------------------
+  // NEW: Auto-focus dropzone on /music and /media (and ?drop=1 anywhere)
+  // ---------------------------
+  function autoFocusDropzone() {
+    if (!dropzone) return;
+
+    const params = new URLSearchParams(location.search);
+    const force = params.get("drop") === "1";
+    const should = force || PAGE_MODE === "music" || PAGE_MODE === "media";
+    if (!should) return;
+
+    // wait a tick so layout is stable
+    setTimeout(() => {
+      try {
+        dropzone.scrollIntoView({ behavior: "smooth", block: "center" });
+        dropzone.classList.add("flash");
+        setTimeout(() => dropzone.classList.remove("flash"), 900);
+      } catch {}
+    }, 150);
+  }
+
+  // ---------------------------
   // Go
   // ---------------------------
   detectAndRender();
   bindDropzone();
+  autoFocusDropzone();
 })();
