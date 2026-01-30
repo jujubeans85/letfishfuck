@@ -2,7 +2,7 @@
   const $ = (sel, el = document) => el.querySelector(sel);
 
   // ---------------------------
-  // Theme toggle
+  // Theme toggle (persisted)
   // ---------------------------
   const root = document.documentElement;
   const modeBtn = $("#modeBtn");
@@ -28,9 +28,6 @@
   // ---------------------------
   // Page mode auto-detect
   // ---------------------------
-  // root page: /
-  // music page: /music/
-  // media page: /media/
   const path = (location.pathname || "/").toLowerCase();
   const PAGE_MODE =
     path.includes("/music") ? "music" :
@@ -38,12 +35,18 @@
     "all";
 
   // ---------------------------
-  // Helpers
+  // DOM refs
   // ---------------------------
   const previewsEl = $("#previews");
   const dropzone = $("#dropzone");
   const filePicker = $("#filePicker");
+  const toastEl = $("#toast");
+  const copyLinkBtn = $("#copyLink");
+  const copyEmailBtn = $("#copyEmail");
 
+  // ---------------------------
+  // Helpers
+  // ---------------------------
   function ext(name) {
     const i = name.lastIndexOf(".");
     return i >= 0 ? name.slice(i + 1).toLowerCase() : "";
@@ -88,10 +91,12 @@
     if (kind === "image") {
       body = `<div class="thumb"><img src="${url}" alt="${safeName}" loading="lazy"></div>`;
     } else if (kind === "audio") {
-      body = `<div class="thumb" style="padding:10px"><audio controls preload="metadata" src="${url}"></audio></div>`;
+      body = `<div class="thumb" style="padding:10px">
+        <audio controls preload="metadata" style="width:100%" src="${url}"></audio>
+      </div>`;
     } else if (kind === "video") {
       body = `<div class="thumb" style="padding:10px">
-        <video controls playsinline muted preload="metadata" style="width:100%; border-radius:14px;" src="${url}"></video>
+        <video controls playsinline preload="metadata" style="width:100%; border-radius:14px;" src="${url}"></video>
       </div>`;
     } else if (kind === "pdf") {
       body = `<div class="thumb" style="padding:12px">
@@ -123,35 +128,60 @@
   }
 
   // ---------------------------
-  // Asset detection
-  // (static hosting can't list directories — we probe likely filenames)
+  // Toast + copy helpers (root only, but safe everywhere)
   // ---------------------------
-  // We support both naming styles:
-  //  - work-01.mp3 / work-01.jpg / work-01.mp4
-  //  - media-01.mp4 for media page
-  const CANDIDATES = (() => {
-    const out = [];
+  let toastTimer = null;
 
-    // common numbered slots
-    for (let i = 1; i <= 24; i++) {
-      const n = String(i).padStart(2, "0");
+  function toast(msg) {
+    if (!toastEl) return;
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1800);
+  }
 
-      // work-xx.*
-      out.push(`assets/work-${n}.jpg`, `assets/work-${n}.jpeg`, `assets/work-${n}.png`, `assets/work-${n}.webp`);
-      out.push(`assets/work-${n}.mp3`, `assets/work-${n}.wav`, `assets/work-${n}.m4a`);
-      out.push(`assets/work-${n}.mp4`, `assets/work-${n}.mov`, `assets/work-${n}.webm`);
-      out.push(`assets/work-${n}.pdf`);
-
-      // media-xx.mp4 (media page)
-      out.push(`assets/media-${n}.mp4`, `assets/media-${n}.mov`, `assets/media-${n}.webm`);
+  async function copyToClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      // fallback
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.left = "-9999px";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand("copy");
+        ta.remove();
+        return ok;
+      } catch {
+        return false;
+      }
     }
+  }
 
-    // portfolio locations
-    out.push(`PORTFOLIO.pdf`, `assets/PORTFOLIO.pdf`);
+  if (copyLinkBtn) {
+    copyLinkBtn.addEventListener("click", async () => {
+      const ok = await copyToClipboard(location.href);
+      toast(ok ? "Link copied ✅" : "Couldn’t copy link 😵");
+    });
+  }
 
-    return out;
-  })();
+  if (copyEmailBtn) {
+    copyEmailBtn.addEventListener("click", async () => {
+      // If you later add a visible email element, swap this.
+      const email = "arts-internships-info@unimelb.edu.au";
+      const ok = await copyToClipboard(email);
+      toast(ok ? "Email copied ✅" : "Couldn’t copy email 😵");
+    });
+  }
 
+  // ---------------------------
+  // Asset detection (dead-streak stop)
+  // ---------------------------
   async function exists(url) {
     try {
       const res = await fetch(url, { method: "HEAD", cache: "no-store" });
@@ -161,32 +191,65 @@
     }
   }
 
+  function slotCandidates(n) {
+    const nn = String(n).padStart(2, "0");
+    const out = [];
+
+    // audio/pdf (music + root)
+    out.push(`assets/work-${nn}.mp3`, `assets/work-${nn}.wav`, `assets/work-${nn}.m4a`);
+    out.push(`assets/work-${nn}.pdf`);
+
+    // images (root + media)
+    out.push(`assets/work-${nn}.jpg`, `assets/work-${nn}.jpeg`, `assets/work-${nn}.png`, `assets/work-${nn}.webp`);
+
+    // video (root + media)
+    out.push(`assets/work-${nn}.mp4`, `assets/work-${nn}.mov`, `assets/work-${nn}.webm`);
+
+    // media-xx videos (media page)
+    out.push(`assets/media-${nn}.mp4`, `assets/media-${nn}.mov`, `assets/media-${nn}.webm`);
+
+    // filter by PAGE_MODE
+    return out.filter((p) => allowed(typeFromExt(ext(p))));
+  }
+
   async function detectAndRender() {
     if (!previewsEl) return;
 
     const found = [];
-    const filtered = CANDIDATES.filter((p) => allowed(typeFromExt(ext(p))));
 
-    // keep it sane on mobile Safari
-    const CONCURRENCY = 6;
-    let idx = 0;
-
-    async function worker() {
-      while (idx < filtered.length) {
-        const i = idx++;
-        const path = filtered[i];
-        const url = path.startsWith("/") ? path : `/${path}`;
-
-        const ok = await exists(url);
-        if (ok) {
-          const name = path.split("/").pop();
-          const k = typeFromExt(ext(path));
-          found.push({ name, url, kind: k });
-        }
+    // Always try portfolio first
+    const portfolioCandidates = [`/PORTFOLIO.pdf`, `/assets/PORTFOLIO.pdf`];
+    for (const u of portfolioCandidates) {
+      if (allowed("pdf") && (await exists(u))) {
+        found.push({ name: u.split("/").pop(), url: u, kind: "pdf" });
+        break; // root copy is canonical; stop after first hit
       }
     }
 
-    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+    const MAX_SLOTS = 30;
+    const DEAD_STREAK_STOP = 8;
+    let dead = 0;
+
+    for (let i = 1; i <= MAX_SLOTS; i++) {
+      const candidates = slotCandidates(i);
+
+      // probe this slot: if ANY exists, record all that exist (for this slot)
+      let hit = false;
+
+      for (const p of candidates) {
+        const url = `/${p}`;
+        if (await exists(url)) {
+          hit = true;
+          found.push({ name: p.split("/").pop(), url, kind: typeFromExt(ext(p)) });
+        }
+      }
+
+      if (hit) dead = 0;
+      else dead++;
+
+      // stop early when it's clearly over (after at least a few attempts)
+      if (i >= 6 && dead >= DEAD_STREAK_STOP) break;
+    }
 
     found.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
@@ -207,7 +270,7 @@
   }
 
   // ---------------------------
-  // Drag + drop preview (LOCAL only)
+  // Drag + drop preview (local)
   // ---------------------------
   function bindDropzone() {
     if (!dropzone || !previewsEl) return;
@@ -217,8 +280,7 @@
       for (const f of fileList) {
         const k = typeFromExt(ext(f.name));
         if (!allowed(k)) continue;
-        const url = URL.createObjectURL(f);
-        items.push({ name: f.name, url, kind: k });
+        items.push({ name: f.name, url: URL.createObjectURL(f), kind: k });
       }
       if (items.length) renderCards(items);
     }
@@ -227,20 +289,21 @@
       dropzone.classList.toggle("dragover", !!on);
     }
 
+    // Prevent Safari from opening dragged files as navigation
+    window.addEventListener("dragover", (e) => e.preventDefault());
+    window.addEventListener("drop", (e) => e.preventDefault());
+
     dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
       setDragOver(true);
     });
-
     dropzone.addEventListener("dragleave", () => setDragOver(false));
-
     dropzone.addEventListener("drop", (e) => {
       e.preventDefault();
       setDragOver(false);
       if (e.dataTransfer?.files?.length) handleFiles(e.dataTransfer.files);
     });
 
-    // click-to-pick if present
     if (filePicker) {
       dropzone.addEventListener("click", () => filePicker.click());
       filePicker.addEventListener("change", (e) => {
@@ -249,7 +312,6 @@
       });
     }
 
-    // keyboard accessibility
     dropzone.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
