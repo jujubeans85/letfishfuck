@@ -1,7 +1,9 @@
 [build]
   publish = "."
 
-# Nice defaults for a static portfolio
+# ----------------------------
+# Security + sane defaults
+# ----------------------------
 [[headers]]
   for = "/*"
   [headers.values]
@@ -11,22 +13,30 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
-# Cache assets hard (images/audio/video)
+# Cache static assets hard (images/audio/video)
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Don’t hard-cache HTML (so edits show up fast)
+# Don't hard-cache HTML (so edits show up fast)
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# ----------------------------
 # Pretty URLs -> on-page sections
+# (these prevent /work etc hitting 404)
+# ----------------------------
 [[redirects]]
-  from = "/enter"
-  to = "/work"
+  from = "/work"
+  to = "/#work"
+  status = 301
+
+[[redirects]]
+  from = "/work/"
+  to = "/#work"
   status = 301
 
 [[redirects]]
@@ -35,28 +45,47 @@
   status = 301
 
 [[redirects]]
+  from = "/about/"
+  to = "/#about"
+  status = 301
+
+[[redirects]]
   from = "/contact"
   to = "/#contact"
   status = 301
 
-# Extra shortcuts
 [[redirects]]
-  from = "/music"
-  to = "/#work"
+  from = "/contact/"
+  to = "/#contact"
   status = 301
 
-[[redirects]]
-  from = "/media"
-  to = "/#work"
-  status = 301
-
-# PDF shortcuts (root is the canonical copy)
-[[redirects]]
-  from = "/.pdf"
-  to = "/PORTFOLIO.pdf"
-  status = 301
-
+# PDF shortcut (root copy is canonical)
 [[redirects]]
   from = "/pdf"
   to = "/PORTFOLIO.pdf"
   status = 301
+
+[[redirects]]
+  from = "/pdf/"
+  to = "/PORTFOLIO.pdf"
+  status = 301
+
+# Normalize folder routes (avoids duplicate URL variants)
+[[redirects]]
+  from = "/music"
+  to = "/music/"
+  status = 301
+
+[[redirects]]
+  from = "/media"
+  to = "/media/"
+  status = 301
+
+# ----------------------------
+# SPA fallback (DISABLED)
+# Only enable if you ever convert to SPA routing.
+# ----------------------------
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200
