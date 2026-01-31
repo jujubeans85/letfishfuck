@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Stem Dice",
+    "description": "Roll-to-trigger stems/actions. NFC/QR faces. Prototype zone.",
+    "status": "seed",
+    "tags": [
+      "hardware",
+      "nfc",
+      "game"
+    ],
+    "href": "/playground"
+  },
+  {
+    "title": "Read the Room engine",
+    "description": "Predict the 'fuck yeah' moment, choose next action. Feedback loop.",
+    "status": "concept",
+    "tags": [
+      "dj",
+      "timing",
+      "models"
+    ],
+    "href": "/playground"
+  }
+]
