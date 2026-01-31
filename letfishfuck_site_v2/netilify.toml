@@ -1,9 +1,9 @@
 [build]
   publish = "."
 
-# ------------------------------------------------------------
+# ----------------------------------------
 # Security + sane defaults
-# ------------------------------------------------------------
+# ----------------------------------------
 [[headers]]
   for = "/*"
   [headers.values]
@@ -25,17 +25,10 @@
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
-# ------------------------------------------------------------
-# Pretty URLs -> on-page sections (prevents /work etc hitting 404)
-# ------------------------------------------------------------
-
-# Splash button shortcuts (adjust later if splash becomes / and main becomes /home)
-[[redirects]]
-  from = "/enter"
-  to = "/#work"
-  status = 301
-
-# Root section shortcuts
+# ----------------------------------------
+# Pretty URLs -> on-page sections (anchors)
+# (prevents /work etc hitting 404)
+# ----------------------------------------
 [[redirects]]
   from = "/work"
   to = "/#work"
@@ -88,10 +81,10 @@
   to = "/media/"
   status = 301
 
-# ------------------------------------------------------------
+# ----------------------------------------
 # SPA fallback (DISABLED)
-# Only enable if you ever convert to SPA routing.
-# ------------------------------------------------------------
+# Only enable if you convert to SPA routing.
+# ----------------------------------------
 # [[redirects]]
 #   from = "/*"
 #   to = "/index.html"
