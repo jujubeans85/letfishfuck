@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Media — LETFISHFUCK</title>
+  <meta name="description" content="Clips, visuals, fragments. Proof of life." />
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+<body>
+  <div data-include="/partials/header.html"></div>
+
+  <div class="wrap">
+    <section class="card hero">
+      <h1>Media</h1>
+      <p class="lede">Clips, visuals, fragments. Proof of life.</p>
+    </section>
+
+    <section class="section">
+  <div class="hr"></div>
+  <div id="projectsGrid" class="grid" aria-live="polite"></div>
+</section>
+
+
+    <div data-include="/partials/footer.html"></div>
+  </div>
+
+  <script src="/assets/js/app.js"></script>
+  <script src="/assets/js/render-projects.js"></script>
+<script>window.LFF.renderProjects && window.LFF.renderProjects({targetId:"projectsGrid", filter:{kind:"media"}});</script>
+</body>
+</html>

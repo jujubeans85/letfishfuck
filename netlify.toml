@@ -1,0 +1,87 @@
+[build]
+  base = "letfishfuck_site_v2"
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[redirects]]
+  from = "/work"
+  to = "/app/work.html"
+  status = 301
+
+[[redirects]]
+  from = "/work/"
+  to = "/app/work.html"
+  status = 301
+
+[[redirects]]
+  from = "/media"
+  to = "/app/media.html"
+  status = 301
+
+[[redirects]]
+  from = "/media/"
+  to = "/app/media.html"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/app/contact.html"
+  status = 301
+
+[[redirects]]
+  from = "/contact/"
+  to = "/app/contact.html"
+  status = 301
+
+[[redirects]]
+  from = "/playground"
+  to = "/app/playground.html"
+  status = 301
+
+[[redirects]]
+  from = "/playground/"
+  to = "/app/playground.html"
+  status = 301
+
+[[redirects]]
+  from = "/notes"
+  to = "/app/notes.html"
+  status = 301
+
+[[redirects]]
+  from = "/notes/"
+  to = "/app/notes.html"
+  status = 301
+
+[[redirects]]
+  from = "/app"
+  to = "/app/"
+  status = 301
+
+[[redirects]]
+  from = "/pdf"
+  to = "/PORTFOLIO.pdf"
+  status = 301
+
+[[redirects]]
+  from = "/pdf/"
+  to = "/PORTFOLIO.pdf"
+  status = 301
