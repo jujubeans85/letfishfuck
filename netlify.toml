@@ -1,7 +1,9 @@
 [build]
-  base = "letfishfuck_site_v2"
-  publish = "."
+  publish = "letfishfuck_site_v2"
 
+# ----------------------------
+# Security + sane defaults
+# ----------------------------
 [[headers]]
   for = "/*"
   [headers.values]
@@ -11,23 +13,33 @@
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
 
+# Cache static assets hard
 [[headers]]
   for = "/assets/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Don't hard-cache HTML
 [[headers]]
   for = "/*.html"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
 
+# ----------------------------
+# Pretty routes -> real pages
+# ----------------------------
 [[redirects]]
-  from = "/work"
-  to = "/app/work.html"
+  from = "/app"
+  to = "/app/"
   status = 301
 
 [[redirects]]
-  from = "/work/"
+  from = "/enter"
+  to = "/app/"
+  status = 301
+
+[[redirects]]
+  from = "/work"
   to = "/app/work.html"
   status = 301
 
@@ -37,17 +49,7 @@
   status = 301
 
 [[redirects]]
-  from = "/media/"
-  to = "/app/media.html"
-  status = 301
-
-[[redirects]]
   from = "/contact"
-  to = "/app/contact.html"
-  status = 301
-
-[[redirects]]
-  from = "/contact/"
   to = "/app/contact.html"
   status = 301
 
@@ -57,31 +59,12 @@
   status = 301
 
 [[redirects]]
-  from = "/playground/"
-  to = "/app/playground.html"
-  status = 301
-
-[[redirects]]
   from = "/notes"
   to = "/app/notes.html"
   status = 301
 
-[[redirects]]
-  from = "/notes/"
-  to = "/app/notes.html"
-  status = 301
-
-[[redirects]]
-  from = "/app"
-  to = "/app/"
-  status = 301
-
+# PDF shortcut
 [[redirects]]
   from = "/pdf"
-  to = "/PORTFOLIO.pdf"
-  status = 301
-
-[[redirects]]
-  from = "/pdf/"
   to = "/PORTFOLIO.pdf"
   status = 301
