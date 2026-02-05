@@ -1,0 +1,114 @@
+.splash{
+  min-height: 100svh;
+  display:grid;
+  place-items:center;
+  padding:18px;
+  position:relative;
+  z-index:1;
+}
+
+.splash-inner{
+  width: min(1100px, 100%);
+  aspect-ratio: 16 / 10;
+  border-radius: 18px;
+  overflow:hidden;
+  position:relative;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,.10);
+  background:
+    radial-gradient(900px 520px at 20% 0%, rgba(77,227,255,.16), transparent 60%),
+    radial-gradient(800px 520px at 90% 10%, rgba(255,59,47,.14), transparent 60%),
+    url("/assets/img/home.jpg") center/cover no-repeat;
+}
+
+.splash-inner::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  opacity:.18;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, transparent 1px 4px),
+    radial-gradient(circle at 20% 20%, rgba(255,232,106,.10), transparent 50%);
+  mix-blend-mode: overlay;
+}
+
+.splash-top{
+  position:absolute;
+  left:18px;
+  top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  padding:10px 12px;
+  border-radius:14px;
+  background: rgba(10,10,12,.55);
+  backdrop-filter: blur(10px);
+  border:1px solid rgba(255,255,255,.10);
+}
+.splash-mark{
+  font-weight:900;
+  letter-spacing:.08em;
+}
+.splash-mark span{
+  margin-left:10px;
+  color: var(--cold);
+  filter: drop-shadow(var(--glow-cold));
+}
+.splash-sub{ opacity:.80; font-size: 13px; }
+
+.splash-mode{
+  position:absolute;
+  right:18px;
+  top:18px;
+}
+
+.splash-center{
+  position:absolute;
+  left:18px;
+  bottom:18px;
+  right:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:12px;
+  pointer-events:none;
+}
+.splash-tagline{
+  pointer-events:auto;
+  padding:12px 14px;
+  border-radius: 16px;
+  background: rgba(10,10,12,.52);
+  backdrop-filter: blur(10px);
+  border:1px solid rgba(255,255,255,.10);
+  max-width: 420px;
+}
+
+.splash-actions{
+  position:absolute;
+  right:18px;
+  bottom:18px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.splash-foot{
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:18px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  transform: translateY(62px);
+  font-size: 13px;
+  opacity:.90;
+  pointer-events:none;
+}
+
+@media (max-width: 720px){
+  .splash-inner{ aspect-ratio: 10/14; }
+  .splash-foot{ display:none; }
+}

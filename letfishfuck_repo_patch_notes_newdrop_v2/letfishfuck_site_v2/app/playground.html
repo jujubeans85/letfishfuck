@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Playground — LETFISHFUCK</title>
+  <meta name="description" content="Prototype zone." />
+
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+
+<body class="noise" data-page="playground">
+  <a class="skip" href="#main">Skip to content</a>
+  <div id="siteHeader"></div>
+
+  <main id="main" class="wrap">
+    <header class="pagehead">
+      <div>
+        <p class="kicker">EDGE ZONE</p>
+        <h1 class="h1 smallh1">Playground</h1>
+        <p class="lede">Prototypes, seeds, unfinished rituals. The good stuff.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn" id="copyLink" type="button">Copy link</button>
+        <a class="btn ghost" href="/app/">Back to Hub</a>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Experiments</h2>
+        <p class="muted">Driven by <code>/data/experiments.json</code>.</p>
+      </div>
+      <div class="grid" id="experimentsGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="panel">
+        <h3>Optional: Mini log</h3>
+        <p class="muted">Add quick notes here without committing to a full post. Or don’t. Chaos is allowed.</p>
+      </div>
+    </section>
+
+    <div id="siteFooter"></div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>

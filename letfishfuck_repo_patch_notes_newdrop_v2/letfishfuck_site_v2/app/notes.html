@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notes — LETFISHFUCK</title>
+  <meta name="description" content="Living log." />
+
+  <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/assets/css/base.css" />
+  <link rel="stylesheet" href="/assets/css/app.css" />
+</head>
+
+<body class="noise" data-page="notes">
+  <a class="skip" href="#main">Skip to content</a>
+  <div id="siteHeader"></div>
+
+  <main id="main" class="wrap">
+    <header class="pagehead">
+      <div>
+        <p class="kicker">Living log</p>
+        <h1 class="h1 smallh1">Notes</h1>
+        <p class="lede">Short entries. No essays. Proof of life.</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn" id="copyLink" type="button">Copy link</button>
+        <a class="btn ghost" href="/app/">Back to Hub</a>
+      </div>
+    </header>
+
+    <section class="section">
+      <div class="panel">
+        <h3>How to use notes</h3>
+        <ul class="list">
+          <li>Keep it raw. Date + 1–3 lines.</li>
+          <li>Link out to media when it exists.</li>
+          <li>If it starts feeling “portfolio-ish”, set it on fire and do something weird.</li>
+        </ul>
+        <div class="hr"></div>
+        <p class="small muted">Edit <code>/data/notes.json</code> to add entries. Optional fields: <code>mood</code>, <code>tags</code>, <code>link</code>, <code>media</code>.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2>Entries</h2>
+        <p class="muted">Newest first.</p>
+      </div>
+      <div class="grid" id="notesGrid"></div>
+    </section>
+
+    <div id="siteFooter"></div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>

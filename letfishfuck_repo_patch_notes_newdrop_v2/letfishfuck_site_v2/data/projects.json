@@ -1,0 +1,22 @@
+[
+  {
+    "category": "work",
+    "title": "Work — Sonic postcard v1",
+    "desc": "A small web postcard that carries sound + mood. Built to evolve.",
+    "year": 2026,
+    "tags": ["web", "audio", "interactive"],
+    "slug": "sonic-postcard-v1",
+    "route": "/app/work.html#sonic-postcard-v1",
+    "date": "2026-02-01"
+  },
+  {
+    "category": "media",
+    "title": "Media — Live set fragments",
+    "desc": "Loose clips + artifacts. Not polished. Alive.",
+    "year": 2026,
+    "tags": ["video", "field", "sketch"],
+    "slug": "live-set-fragments",
+    "route": "/app/media.html#live-set-fragments",
+    "date": "2026-02-01"
+  }
+]

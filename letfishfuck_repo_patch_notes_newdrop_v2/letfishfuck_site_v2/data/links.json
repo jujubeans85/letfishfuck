@@ -1,0 +1,16 @@
+[
+  {
+    "title": "SoundCloud",
+    "desc": "Add the real link when ready.",
+    "tags": ["audio"],
+    "url": "https://soundcloud.com/",
+    "slug": "soundcloud"
+  },
+  {
+    "title": "YouTube",
+    "desc": "Add the real channel when ready.",
+    "tags": ["video"],
+    "url": "https://youtube.com/",
+    "slug": "youtube"
+  }
+]

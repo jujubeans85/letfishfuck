@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Stem Dice",
+    "desc": "Roll-to-trigger stems/actions. NFC/QR faces. Prototype zone.",
+    "year": 2026,
+    "tags": ["hardware", "nfc", "game"],
+    "slug": "stem-dice",
+    "route": "/app/playground.html#stem-dice",
+    "date": "2026-02-01"
+  },
+  {
+    "title": "Read the Room engine",
+    "desc": "Predict the 'fuck yeah' moment, choose next action. Feedback loop.",
+    "year": 2026,
+    "tags": ["dj", "timing", "models"],
+    "slug": "read-the-room",
+    "route": "/app/playground.html#read-the-room",
+    "date": "2026-02-01"
+  }
+]
