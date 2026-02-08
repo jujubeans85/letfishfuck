@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/assets/css/base.css" />
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
-<body>
+<body data-page="notes">
   <div data-include="/partials/header.html"></div>
 
   <div class="wrap">
@@ -19,22 +19,12 @@
     </section>
 
     <section class="section">
-  <div class="hr"></div>
-  <div class="tile">
-    <h3>Living log</h3>
-    <p class="muted">Short dated notes. Breadcrumbs for future Mimi.</p>
-    <ul>
-      <li><strong>2026-01-31</strong> — “Edge-board” architecture dropped in.</li>
-      <li><strong>TODO</strong> — Replace placeholder image, add real contact.</li>
-    </ul>
+      <div class="hr"></div>
+      <div id="notesList" class="grid" aria-live="polite"></div>
+    </section>
+
+<div data-include="/partials/footer.html"></div>
   </div>
-</section>
-
-
-    <div data-include="/partials/footer.html"></div>
-  </div>
-
-  <script src="/assets/js/app.js"></script>
-  
+  <script src="/js/app.js" defer></script>
 </body>
 </html>

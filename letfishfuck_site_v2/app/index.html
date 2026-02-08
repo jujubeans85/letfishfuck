@@ -9,13 +9,21 @@
   <link rel="stylesheet" href="/assets/css/base.css" />
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
-<body>
+<body data-page="hub">
   <div data-include="/partials/header.html"></div>
 
   <div class="wrap">
     <section class="card hero">
       <h1>Hub</h1>
       <p class="lede">Home base. Pick a door. Add sparks. Keep it moving.</p>
+    </section>
+
+    <section class="section">
+      <div class="hr"></div>
+      <h2 style="margin:0 0 8px;">New Drop</h2>
+      <div id="newDrop" class="grid" aria-live="polite"></div>
+    </section>
+
     </section>
 
     <section class="section">
@@ -39,10 +47,6 @@
 
     <div data-include="/partials/footer.html"></div>
   </div>
-
-  <script src="/assets/js/app.js"></script>
-  <script src="/assets/js/render-projects.js"></script>
-<script src="/assets/js/render-experiments.js"></script>
-<script>window.LFF.renderHome && window.LFF.renderHome();</script>
+<script src="/js/app.js" defer></script>
 </body>
 </html>
