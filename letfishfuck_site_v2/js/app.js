@@ -5,8 +5,12 @@
 (() => {
   'use strict';
 
+// LFF build id (debug)
+const LFF_BUILD = 'v14-restore-engine';
+
   // Namespace
   const LFF = window.LFF = window.LFF || {};
+LFF.BUILD = 'v13';
 
   // ---------- tiny utils ----------
   const $  = (sel, root=document) => root.querySelector(sel);
@@ -15,6 +19,7 @@
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 
+  const escapeHtml = escapeHTML;
   // Fetch JSON with sane errors
   async function getJSON(path) {
     const res = await fetch(path, { cache: 'no-store' });
@@ -49,19 +54,12 @@
     try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
   }
   function initTheme() {
-    const saved = (() => { try { return localStorage.getItem(THEME_KEY); } catch(_) { return null; } })();
-    if (saved) applyTheme(saved);
+    // Dark is the default. Toggle is disabled, so we force dark and clear any old saved preference.
+    try { localStorage.removeItem(THEME_KEY); } catch(_) {}
+    applyTheme("dark");
+}
 
-    // If there is a toggle button, wire it.
-    const btn = $('#modeBtn');
-    if (btn) {
-      btn.addEventListener('click', () => {
-        const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-        applyTheme(cur === 'dark' ? 'light' : 'dark');
-      });
-    }
-  }
-  LFF.applyTheme = applyTheme;
+LFF.applyTheme = applyTheme;
 
   // ---------- Media rendering ----------
   function normalizeMedia(media) {
@@ -94,37 +92,68 @@
         return `<a class="chip" href="${escapeHTML(src)}" target="_blank" rel="noopener">${escapeHTML(title)}</a>`;
       }
       return '';
-    }).join('');
+    }).join(' ');
     return `<div class="chips media-chips">${items}</div>`;
   }
 
   // ---------- Cards ----------
   function cardHTML(item, kind) {
-    const title = item.title || item.name || '(untitled)';
-    const desc  = item.description || item.desc || item.text || '';
-    const tags  = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : []);
-    const date  = item.date || item.when || '';
-    const href  = item.url || item.link || '';
+  const title = escapeHtml(item.title || '');
+  const desc = escapeHtml(item.desc || '');
 
-    const tagHTML = tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHTML(t)}</span>`).join('')}</div>` : '';
-    const mediaHTML = renderMedia(item.media);
+  // Card click target:
+  // - prefer explicit internal path (item.path)
+  // - otherwise, if item.href exists, use it
+  // - otherwise, fall back to an internal section route (so cards don't fling you to GitHub by accident)
+  const defaultHref = (k) => {
+    // Accept both singular + plural so cards never go dead from a naming mismatch.
+    switch (k) {
+      case 'note':
+      case 'notes': return '/notes/';
+      case 'project':
+      case 'projects': return '/work/';
+      case 'experiment':
+      case 'experiments': return '/playground/';
+      case 'media': return '/media/';
+      case 'link':
+      case 'links': return ''; // external links should provide href in data
+      default: return '';
+    }
+  };
 
-    const head = href
-      ? `<h3><a href="${escapeHTML(href)}" target="_blank" rel="noopener">${escapeHTML(title)}</a></h3>`
-      : `<h3>${escapeHTML(title)}</h3>`;
+  const href = (item.path || item.href || defaultHref(kind) || '').trim();
 
-    const meta = date ? `<div class="small muted">${escapeHTML(date)}</div>` : '';
+  // Small “chips” (tags)
+  const tags = Array.isArray(item.tags) ? item.tags : [];
+  const tagsHtml = tags.length
+    ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('')}</div>`
+    : '';
 
-    return `
-      <article class="card item" data-kind="${escapeHTML(kind||'')}">
-        ${head}
-        ${meta}
-        ${desc ? `<p>${escapeHTML(desc)}</p>` : ''}
-        ${mediaHTML}
-        ${tagHTML}
-      </article>
-    `;
-  }
+  // Optional sub-links rendered as safe anchors (won't get swallowed by card click)
+  const links = Array.isArray(item.links) ? item.links : [];
+  const linksHtml = links.length
+    ? `<div class="card-links">${links.map(l => {
+        const lh = (l && l.href) ? String(l.href) : '';
+        const ll = escapeHtml((l && (l.label || l.title)) ? String(l.label || l.title) : 'link');
+        const isExt = /^https?:\/\//i.test(lh);
+        const target = isExt ? ' target="_blank" rel="noopener"' : '';
+        return `<a class="chip-link" href="${escapeHtml(lh)}"${target}>${ll}</a>`;
+      }).join('')}</div>`
+    : '';
+
+  // role/tabindex makes the whole thing feel like a real button on iOS
+  const hrefAttr = href ? ` data-href="${escapeHtml(href)}" role="link" tabindex="0"` : '';
+
+  return `
+    <div class="card"${hrefAttr}>
+      <div class="card-title">${title}</div>
+      ${desc ? `<div class="card-desc">${desc}</div>` : ''}
+      ${linksHtml}
+      ${tagsHtml}
+    </div>
+  `;
+}
+
 
   function renderInto(container, items, kind) {
     if (!container) return;
@@ -288,8 +317,72 @@
       break;
     }
   }
+function wireCardClicks(root = document) {
+  if (window.__LFF_cardsDelegated) return;
+  window.__LFF_cardsDelegated = true;
 
-  async function initByPage() {
+  let lastNav = { href: '', t: 0 };
+
+  const go = (href) => {
+    if (!href) return;
+    const h = String(href).trim();
+
+    // de-dupe double fires (touchend + click)
+    const now = Date.now();
+    if (lastNav.href === h && (now - lastNav.t) < 600) return;
+    lastNav = { href: h, t: now };
+
+    const isExternal = /^https?:\/\//i.test(h);
+    if (isExternal) {
+      window.open(h, '_blank', 'noopener');
+      return;
+    }
+    window.location.href = h;
+  };
+
+  const handler = (e) => {
+    const card = e.target.closest('.card[data-href]');
+    if (!card) return;
+
+    // If the user tapped a real control INSIDE the card, let it do its thing,
+    // unless it's a dummy link (href missing / '#') — then treat it like a card tap.
+    const interactive = e.target.closest('a,button,input,textarea,select,label,[role="button"]');
+    if (interactive && card.contains(interactive) && interactive !== card) {
+      if (interactive.tagName === 'A') {
+        const hrefAttr = (interactive.getAttribute('href') || '').trim();
+        if (hrefAttr && hrefAttr !== '#') return;
+        // dummy link -> fallthrough to card nav
+      } else {
+        return;
+      }
+    }
+
+    const href = card.getAttribute('data-href');
+    if (!href) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    go(href);
+  };
+
+  // Click + iOS fallback
+  root.addEventListener('click', handler, { passive: false, capture: true });
+  root.addEventListener('touchend', handler, { passive: false, capture: true });
+  root.addEventListener('pointerup', handler, { passive: false, capture: true });
+
+  // Keyboard accessibility (Enter/Space on focused card)
+  root.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const card = e.target.closest('.card[data-href]');
+    if (!card) return;
+    if (e.target !== card) return; // only when the card itself is focused
+    e.preventDefault();
+    go(card.getAttribute('data-href'));
+  }, true);
+}
+
+
+async function initByPage() {
     const page = document.body.getAttribute('data-page') || '';
     // Hub has three grids
     if (page === 'hub') {
@@ -321,13 +414,50 @@
     }
   }
 
-  // ---------- Boot ----------
+  
+  // ---------- Debug badge ----------
+  const showDebugBadge = () => {
+    const qs = new URLSearchParams(location.search);
+    if (qs.get('debug') !== '1') return;
+    const el = document.createElement('div');
+    el.id = 'debugBadge';
+    el.textContent = `LFF ${LFF_BUILD}`;
+    el.style.cssText = [
+      'position:fixed',
+      'right:10px',
+      'bottom:10px',
+      'z-index:9999',
+      'padding:6px 10px',
+      'border-radius:999px',
+      'font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial',
+      'background:rgba(0,0,0,.75)',
+      'color:#fff',
+      'border:1px solid rgba(255,255,255,.15)',
+      'backdrop-filter:saturate(140%) blur(6px)'
+    ].join(';');
+    document.body.appendChild(el);
+  };
+
+  const injectLinkSpacingCSS = () => {
+    if (document.getElementById('lffLinkSpacing')) return;
+    const s = document.createElement('style');
+    s.id = 'lffLinkSpacing';
+    s.textContent = `
+      .subLinks a{ margin-right:12px; display:inline-block; }
+    `;
+    document.head.appendChild(s);
+  };
+
+// ---------- Boot ----------
   document.addEventListener('DOMContentLoaded', async () => {
     initTheme();
+    injectLinkSpacingCSS();
+    showDebugBadge();
     await includePartials();
     ensureCratesNavLink();
     hideDraftUIIfNeeded();
     await initByPage();
+    wireCardClicks(document);
     hideDraftUIIfNeeded();
   });
 })();
