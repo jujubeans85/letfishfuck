@@ -6,7 +6,7 @@
   'use strict';
 
 // LFF build id (debug)
-const LFF_BUILD = 'v12-clickfix';
+const LFF_BUILD = 'v16-media-filter';
 
   // Namespace
   const LFF = window.LFF = window.LFF || {};
@@ -170,7 +170,15 @@ LFF.applyTheme = applyTheme;
     try {
       const data = await getJSON('/data/projects.json');
       let items = Array.isArray(data) ? data : (data.projects || []);
-      if (opts.filterKind) items = items.filter(p => (p.kind||'').toLowerCase() === String(opts.filterKind).toLowerCase());
+      if (opts.filterKind) {
+        const fk = String(opts.filterKind).toLowerCase().trim();
+        items = items.filter(p => {
+          const k = String(p.kind || p.section || '').toLowerCase().trim();
+          const title = String(p.title || '').toLowerCase();
+          const tags = Array.isArray(p.tags) ? p.tags.map(t => String(t).toLowerCase().trim()) : [];
+          return k === fk || title.startsWith(fk + ' —') || title.startsWith(fk + ' -') || tags.includes(fk);
+        });
+      }
       renderInto(container, items, 'project');
     } catch (e) {
       if (container) container.innerHTML = `<div class="card error"><strong>Couldn't load projects.json</strong><div class="small muted">${escapeHTML(e.message)}</div></div>`;
