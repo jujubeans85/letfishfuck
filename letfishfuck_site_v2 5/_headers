@@ -1,0 +1,23 @@
+# LFF stability: kill stale cache across iOS/Safari + multi-device.
+# If you ever want performance later, we can tighten these back up.
+
+/app/*
+  Cache-Control: no-store
+
+/index.html
+  Cache-Control: no-store
+
+/*.html
+  Cache-Control: no-store
+
+/js/*
+  Cache-Control: no-store
+
+/assets/js/*
+  Cache-Control: no-store
+
+/data/*
+  Cache-Control: no-store
+
+/crates/*
+  Cache-Control: no-store
