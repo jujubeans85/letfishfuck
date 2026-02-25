@@ -5,30 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notes — LETFISHFUCK</title>
   <meta name="description" content="A living log. Micro updates. Breadcrumbs for future Mimi." />
+
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/base.css" />
   <link rel="stylesheet" href="/assets/css/app.css" />
 </head>
-<body data-page="notes">
-  ...
-  <div id="notesList"></div>
-  ...
-  <script defer src="/assets/js/app.js"></script>
-</body>
 
-  <div class="wrap">
-    <section class="card hero">
-      <h1>Notes</h1>
-      <p class="lede">A living log. Micro updates. Breadcrumbs for future Mimi.</p>
-    </section>
+<body class="noise" data-page="notes">
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- header partial injected by app.js (if you’re using that system) -->
+  <div id="siteHeader"></div>
+
+  <main id="main" class="wrap">
+    <header class="pagehead">
+      <div>
+        <p class="kicker">Living log</p>
+        <h1 class="h1 smallh1">Notes</h1>
+        <p class="lede">A living log. Micro updates. Breadcrumbs for future Mimi.</p>
+      </div>
+
+      <div class="page-actions">
+        <button class="btn" id="copyLink" type="button">Copy link</button>
+        <a class="btn ghost" href="/app/">Back to Hub</a>
+      </div>
+    </header>
 
     <section class="section">
       <div class="hr"></div>
+      <!-- IMPORTANT: this is the mount the renderer expects -->
       <div id="notesList" class="grid" aria-live="polite"></div>
     </section>
 
-<div data-include="/partials/footer.html"></div>
-  </div>
-  <script src="/js/app.js" defer></script>
+    <div id="siteFooter"></div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- SINGLE SCRIPT SOURCE (use shim, not /js/app.js directly) -->
+  <script defer src="/assets/js/app.js"></script>
 </body>
 </html>
