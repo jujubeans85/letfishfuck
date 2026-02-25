@@ -9,7 +9,7 @@
       "site",
       "patch"
     ],
-    "text": "Notes now support media as an array. Drop links, images, audio \u2014 keep it rough.",
+    "desc": "Notes now support media as an array...",
     "media": [
       {
         "type": "link",
