@@ -1,26 +1,67 @@
 [
   {
-    "id": "2026-02-07-001",
-    "title": "First crack at Notes feed",
-    "date": "2026-02-07",
-    "mood": "crusty-grunge / hyper-kind",
+    "id": "n-2026-02-28-drop",
+    "title": "Notes system live",
+    "desc": "Added /data/notes.json + renderer. Cards are tappable on iOS (delegated click + touchend de-dupe).",
+    "date": "2026-02-28",
+    "path": "/notes/",
     "tags": [
+      "lff",
       "notes",
-      "site",
-      "patch"
+      "ship"
     ],
-    "desc": "Notes now support media as an array...",
-    "media": [
+    "links": [
       {
-        "type": "link",
-        "src": "https://letfishfuck.netlify.app/",
-        "title": "Live site"
+        "label": "Debug view",
+        "href": "/?debug=1"
       },
       {
-        "type": "link",
-        "src": "https://github.com/jujubeans85/letfishfuck",
-        "title": "Repo"
+        "label": "Notes page",
+        "href": "/notes/"
       }
+    ]
+  },
+  {
+    "id": "n-live-link-fix",
+    "title": "Fix: Live site link (not GitHub)",
+    "desc": "If any note was pointing 'Live siteRepo' to github.com, use the live domain instead.",
+    "date": "2026-02-28",
+    "tags": [
+      "fix",
+      "links"
+    ],
+    "links": [
+      {
+        "label": "Live",
+        "href": "https://letfishfuck.pro"
+      },
+      {
+        "label": "Repo (GitHub)",
+        "href": "https://github.com/"
+      }
+    ]
+  },
+  {
+    "id": "n-crates-embed",
+    "title": "Crates embedded",
+    "desc": "Crates page iframe + open button wired to Mimi Land crates (Replit).",
+    "date": "2026-02-28",
+    "path": "/crates/",
+    "tags": [
+      "crates",
+      "mimi",
+      "embed"
+    ]
+  },
+  {
+    "id": "n-style-vibe",
+    "title": "Vibe target",
+    "desc": "crusty-grunge + hyper-kind. Keep it dark. Keep it tappable. Keep it one JS file.",
+    "date": "2026-02-28",
+    "tags": [
+      "style",
+      "darkmode",
+      "plur"
     ]
   }
 ]
