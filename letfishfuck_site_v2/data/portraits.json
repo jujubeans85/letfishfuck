@@ -1,0 +1,90 @@
+{
+  "version": "1.0.0",
+  "cards": [
+    {
+      "id": "P-chlo-sat-28-02-am",
+      "title": "Chlo — Sat 28/02 Morning Chilling",
+      "desc": "High-key wash + pencil lines. Sun-bleached joy.",
+      "date": "2026-02-28",
+      "tags": [
+        "chlo",
+        "portrait",
+        "morning",
+        "high-key"
+      ],
+      "filename": "P-chlo-sat-28-02-am.png",
+      "media": [
+        {
+          "type": "image",
+          "src": "/media/portraits/P-chlo-sat-28-02-am.png",
+          "title": "portrait"
+        }
+      ],
+      "playlist_hook": "crate://chlo/morning",
+      "track_seed": "spotify:track:3VkM3CvwzsRaoYZjAXZsqX"
+    },
+    {
+      "id": "P-mum-xmas-card",
+      "title": "Merry XMas Mum",
+      "desc": "Soft gold haze postcard.",
+      "date": "2025-12-25",
+      "tags": [
+        "mum",
+        "postcard",
+        "xmas",
+        "gold"
+      ],
+      "filename": "P-mum-xmas-card.png",
+      "media": [
+        {
+          "type": "image",
+          "src": "/media/portraits/P-mum-xmas-card.png",
+          "title": "card"
+        }
+      ],
+      "playlist_hook": "crate://ma/xmas",
+      "track_seed": "spotify:track:3VkM3CvwzsRaoYZjAXZsqX"
+    },
+    {
+      "id": "P-danielle-noir-selfie",
+      "title": "Noir Selfie",
+      "desc": "High contrast, soft eyes, hard edges.",
+      "date": "2025-12-25",
+      "tags": [
+        "noir",
+        "portrait"
+      ],
+      "filename": "P-danielle-noir-selfie.png",
+      "media": [
+        {
+          "type": "image",
+          "src": "/media/portraits/P-danielle-noir-selfie.png",
+          "title": "noir"
+        }
+      ],
+      "playlist_hook": "crate://noir/soft",
+      "track_seed": "spotify:track:3VkM3CvwzsRaoYZjAXZsqX"
+    },
+    {
+      "id": "G-plur-scribble",
+      "title": "PLUR Scribble",
+      "desc": "Graffiti geometry + gold thread.",
+      "date": "2026-02-28",
+      "tags": [
+        "plur",
+        "glyph",
+        "graffiti"
+      ],
+      "filename": "G-plur-scribble.png",
+      "media": [
+        {
+          "type": "image",
+          "src": "/media/glyphs/G-plur-scribble.png",
+          "title": "glyph"
+        }
+      ],
+      "playlist_hook": "crate://glyphs/plur",
+      "track_seed": "spotify:track:3VkM3CvwzsRaoYZjAXZsqX"
+    }
+  ]
+}
