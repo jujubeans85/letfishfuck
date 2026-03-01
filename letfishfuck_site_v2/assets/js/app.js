@@ -1,14 +1,10 @@
-/* LFF shim (assets/js/app.js)
-   Purpose: catch any pages still loading /assets/js/app.js and forward to /js/app.js.
-   Prevents split-brain paths.
-*/
-(() => {
-  'use strict';
-  const V = 'v14-restore-engine';
-  const target = `/js/app.js?v=${encodeURIComponent(V)}`;
-  const s = document.createElement('script');
-  s.src = target;
-  s.defer = true;
-  s.dataset.lffShim = '1';
+// Shim loader — keep legacy pages alive if they still reference /assets/js/app.js
+// Single source of truth is /js/app.js
+(function(){
+  if (document.querySelector('script[data-lff-main]')) return;
+  var s=document.createElement('script');
+  s.src='/js/app.js';
+  s.defer=true;
+  s.setAttribute('data-lff-main','1');
   document.head.appendChild(s);
 })();
