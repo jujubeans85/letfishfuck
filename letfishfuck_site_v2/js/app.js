@@ -40,6 +40,31 @@
   }
   LFF.getJSON = getJSON;
 
+  // Normalize external links so iOS doesn't choke on custom schemes (e.g., spotify:)
+  function normalizeExternalLink(href) {
+    let h = String(href || '').trim();
+    if (!h) return '';
+    // Spotify app scheme -> https
+    if (h.startsWith('spotify:')) {
+      const parts = h.split(':');
+      if (parts.length >= 3) {
+        const type = parts[1];
+        const id = parts[2];
+        if (type && id) return `https://open.spotify.com/${type}/${id}`;
+      }
+    }
+    // Common "missing scheme" cases
+    if (/^open\.spotify\.com\//i.test(h)) return 'https://' + h;
+    if (/^spotify\.link\//i.test(h)) return 'https://' + h;
+    if (/^soundcloud:\/\//i.test(h)) return h.replace(/^soundcloud:\/\//i, 'https://soundcloud.com/');
+    if (/^https?:\/\//i.test(h)) return h;
+    // Looks like a domain? add https://
+    if (/^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(h)) return 'https://' + h;
+    return h;
+  }
+  LFF.normalizeExternalLink = normalizeExternalLink;
+
+
   // ---------- Partials include (header/footer) ----------
   async function includePartials() {
     const nodes = $$('[data-include]');
@@ -128,8 +153,8 @@
     const chips = [];
 
     // playlist hook & track seed
-    if (item.playlist_hook) chips.push({label:'playlist', href:String(item.playlist_hook)});
-    if (item.track_seed) chips.push({label:'seed', href:String(item.track_seed)});
+    if (item.playlist_hook) chips.push({label:'playlist', href: normalizeExternalLink(item.playlist_hook)});
+    if (item.track_seed) chips.push({label:'seed', href: normalizeExternalLink(item.track_seed)});
 
     // filename suggestion
     if (item.id) {
@@ -139,7 +164,7 @@
 
     if (!chips.length) return '';
     return `<div class="chips smart-chips">
-      ${chips.map(c => `<a class="chip" href="${escapeHtml(c.href)}">${escapeHtml(c.label)}</a>`).join(' ')}
+      ${chips.map(c => { const isExt = /^https?:\/\//i.test(String(c.href||'')); const target = isExt ? ' target="_blank" rel="noopener"' : ''; return `<a class="chip" href="${escapeHtml(c.href)}"${target}>${escapeHtml(c.label)}</a>`; }).join(' ')}
     </div>`;
   }
 
