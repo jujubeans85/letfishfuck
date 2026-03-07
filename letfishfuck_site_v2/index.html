@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LETFISHFUCK — Mimi Marsh</title>
+
   <meta name="description" content="A living edge-board for Mimi. Not just a portfolio." />
   <meta name="theme-color" content="#0b0b0c" />
 
@@ -17,8 +18,40 @@
   <link rel="stylesheet" href="/assets/css/splash.css" />
 
   <style>
-    .splash-hero-wrap{margin:18px 0 8px; border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,.08);}
-    .splash-hero{display:block; width:100%; height:auto;}
+    .splash-hero-wrap{
+      margin:18px 0 8px;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: 0 10px 36px rgba(0,0,0,.28);
+      background: rgba(255,255,255,.03);
+    }
+    .splash-hero{
+      display:block;
+      width:100%;
+      height:auto;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+    }
+    .fallback-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:14px;
+    }
+    .fallback-chips a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+      color: inherit;
+      text-decoration:none;
+      font-size: 13px;
+      line-height: 1;
+    }
   </style>
 </head>
 <body data-page="splash">
@@ -30,22 +63,43 @@
       </div>
 
       <div class="splash-hero-wrap" aria-label="Studio photo">
-        <!-- Put the image at: /assets/img/splash.jpg -->
         <img class="splash-hero" src="/assets/img/splash.jpg" alt="Mimi in the studio" loading="eager" />
       </div>
 
       <nav class="splash-actions" aria-label="Homepage links">
-        <a class="btn primary" href="/app/">ENTER</a>
-        <a class="btn" href="/contact/">CONTACT</a>
+        <a class="btn primary" href="/app/">ENTER HUB</a>
+        <a class="btn" href="/work/">WORK</a>
+        <a class="btn" href="/media/">MEDIA</a>
         <a class="btn ghost" href="/playground/">PLAYGROUND</a>
+        <a class="btn ghost" href="/notes/">NOTES</a>
+        <a class="btn ghost" href="/portraits/">PORTRAITS</a>
+        <a class="btn ghost" href="/crates/">CRATES</a>
+        <a class="btn" href="/contact/">CONTACT</a>
       </nav>
+
+      <div class="fallback-chips" aria-label="Quick links">
+        <a href="/app/" class="chip">⚡ Hub</a>
+        <a href="/work/" class="chip">Work</a>
+        <a href="/media/" class="chip">Media</a>
+        <a href="/playground/" class="chip">Playground</a>
+        <a href="/notes/" class="chip">Notes</a>
+        <a href="/portraits/" class="chip">Portraits</a>
+        <a href="/crates/" class="chip">Crates</a>
+        <a href="/contact/" class="chip">Contact</a>
+      </div>
 
       <div class="splash-note">
         <strong>Edge-board</strong>: throw sparks, prototypes, fragments, audio, weirdness — and let it grow.
       </div>
+
+      <noscript>
+        <div class="splash-note" style="margin-top:14px;">
+          JavaScript is off — the Hub cards won’t render, but the links above still work.
+        </div>
+      </noscript>
     </section>
   </main>
 
-  <script src="/js/app.js" defer></script>
+  <script src="/js/app.js?v=18" defer></script>
 </body>
 </html>
