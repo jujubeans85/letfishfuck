@@ -6,7 +6,7 @@
   'use strict';
 
   // Build id (debug)
-  const LFF_BUILD = 'v15-mapcards';
+  const LFF_BUILD = 'v18-portraits-route-fix';
 
   // Namespace
   const LFF = (window.LFF = window.LFF || {});
@@ -64,6 +64,23 @@
   }
   LFF.normalizeExternalLink = normalizeExternalLink;
 
+  function normalizeInternalPath(path='') {
+    let p = String(path || '').trim();
+    if (!p) return '';
+    p = p.replace(/potraits/gi, 'portraits').replace(/potrait/gi, 'portrait');
+    if (p === '/portrait' || p === '/portrait/') p = '/portraits/';
+    if (p === '/portraits') p = '/portraits/';
+    if (p === '/contact') p = '/contact/';
+    if (p === '/notes') p = '/notes/';
+    if (p === '/work') p = '/work/';
+    if (p === '/media') p = '/media/';
+    if (p === '/playground') p = '/playground/';
+    if (p === '/crates') p = '/crates/';
+    if (p === '/app') p = '/app/';
+    return p;
+  }
+  LFF.normalizeInternalPath = normalizeInternalPath;
+
 
   // ---------- Partials include (header/footer) ----------
   async function includePartials() {
@@ -96,6 +113,24 @@
   }
   LFF.applyTheme = applyTheme;
 
+  // Convert custom hooks into clickable web-safe links (iOS hates unknown schemes).
+  function normalizeHookLink(href, fallbackInternal='/crates/') {
+    const h = String(href || '').trim();
+    if (!h) return '';
+    // Our future custom scheme -> route through crates page.
+    if (/^crate:\/\//i.test(h)) {
+      return `${fallbackInternal}?hook=${encodeURIComponent(h)}`;
+    }
+    // Spotify app URI forms like spotify://track/<id>
+    if (/^spotify:\/\//i.test(h)) {
+      const rest = h.replace(/^spotify:\/\//i, '');
+      const parts = rest.split('/');
+      if (parts.length >= 2) return `https://open.spotify.com/${encodeURIComponent(parts[0])}/${encodeURIComponent(parts[1])}`;
+      return h;
+    }
+    return normalizeExternalLink(h);
+  }
+
   // ---------- Media rendering ----------
   function normalizeMedia(media) {
     if (!media) return [];
@@ -113,7 +148,8 @@
       }
       if (m && typeof m === 'object') {
         const type = (m.type || 'link').toLowerCase();
-        const src = m.src || m.url || '';
+        const srcRaw = m.src || m.url || '';
+        const src = srcRaw.startsWith('/') ? normalizeInternalPath(srcRaw) : (srcRaw ? normalizeExternalLink(srcRaw) : '');
         const title = m.title || m.label || type;
         if (!src) return '';
         if (type === 'image') {
@@ -142,37 +178,59 @@
       case 'card':
       case 'cards':
       case 'portrait':
-      case 'portraits': return '/portraits/'; // optional page
+      case 'portraits': return '/portraits/';
       case 'link':
       case 'links': return ''; // external links should provide href
       default: return '';
     }
   }
 
+  
   function renderSmartChips(item) {
     const chips = [];
 
-    // playlist hook & track seed
-    if (item.playlist_hook) chips.push({label:'playlist', href: normalizeExternalLink(item.playlist_hook)});
-    if (item.track_seed) chips.push({label:'seed', href: normalizeExternalLink(item.track_seed)});
+    const addChip = (label, href, mode='auto') => {
+      const safe = String(href || '').trim();
+      const isExternal = /^https?:\/\//i.test(safe);
 
-    // filename suggestion
-    if (item.id) {
-      const ext = (item.filename && String(item.filename).split('.').pop()) || 'png';
-      chips.push({label:'file', href:`#${escapeHtml(item.filename || suggestedFilename(item.id, ext))}`});
-    }
+      // disabled chip (fallback UI)
+      if (!safe) {
+        chips.push(`<span class="chip chip--disabled" aria-disabled="true">${escapeHtml(label)}</span>`);
+        return;
+      }
 
-    if (!chips.length) return '';
-    return `<div class="chips smart-chips">
-      ${chips.map(c => { const isExt = /^https?:\/\//i.test(String(c.href||'')); const target = isExt ? ' target="_blank" rel="noopener"' : ''; return `<a class="chip" href="${escapeHtml(c.href)}"${target}>${escapeHtml(c.label)}</a>`; }).join(' ')}
-    </div>`;
+      const target = (mode === 'newtab' || (mode === 'auto' && isExternal))
+        ? ` target="_blank" rel="noopener"`
+        : '';
+      chips.push(`<a class="chip" href="${escapeHtml(safe)}"${target}>${escapeHtml(label)}</a>`);
+    };
+
+    // playlist hook (can be crate://, spotify:, http(s), or internal)
+    const ph = item.playlist_hook || item.playlist || item.playlist_url;
+    addChip('playlist', ph ? normalizeHookLink(ph, '/crates/') : '');
+
+    // seed / track
+    const seed = item.track_seed || item.seed || item.track || '';
+    addChip('seed', seed ? normalizeHookLink(seed, '/crates/') : '');
+
+    // file (prefer explicit url, then /media/<filename>)
+    const file = item.file || item.filename || item.asset || '';
+    const fileHref = file
+      ? (String(file).startsWith('/') || /^https?:\/\//i.test(String(file))
+          ? (String(file).startsWith('/') ? normalizeInternalPath(String(file)) : normalizeExternalLink(String(file)))
+          : `/media/${String(file)}`)
+      : '';
+    addChip('file', fileHref);
+
+    return `<div class="chips smart-chips">${chips.join(' ')}</div>`;
   }
 
   function cardHTML(item, kind) {
     const title = escapeHtml(item.title || '');
     const desc  = escapeHtml(item.desc || '');
 
-    const href = (item.path || item.href || defaultHref(kind) || '').trim();
+    const rawHref = (item.path || item.href || defaultHref(kind) || '').trim();
+    const href = rawHref.startsWith('/') ? normalizeInternalPath(rawHref) : rawHref;
     const hrefAttr = href ? ` data-href="${escapeHtml(href)}" role="link" tabindex="0"` : '';
 
     const tags = Array.isArray(item.tags) ? item.tags : [];
@@ -183,7 +241,8 @@
     const links = Array.isArray(item.links) ? item.links : [];
     const linksHtml = links.length
       ? `<div class="card-links">${links.map(l => {
-          const lh = (l && l.href) ? String(l.href) : '';
+          const lhRaw = (l && l.href) ? String(l.href) : '';
+          const lh = lhRaw.startsWith('/') ? normalizeInternalPath(lhRaw) : normalizeExternalLink(lhRaw);
           const ll = escapeHtml((l && (l.label || l.title)) ? String(l.label || l.title) : 'link');
           const isExt = /^https?:\/\//i.test(lh);
           const target = isExt ? ' target="_blank" rel="noopener"' : '';
