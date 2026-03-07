@@ -4,58 +4,41 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LETFISHFUCK — Mimi Marsh</title>
-
   <meta name="description" content="A living edge-board for Mimi. Not just a portfolio." />
   <meta name="theme-color" content="#0b0b0c" />
 
   <meta property="og:title" content="LETFISHFUCK — Mimi Marsh" />
   <meta property="og:description" content="Quiet confidence. Loud output. Edge-board." />
   <meta property="og:type" content="website" />
-  <meta property="og:image" content="/assets/img/splash-studio.jpg" />
+  <meta property="og:image" content="/assets/img/splash.jpg" />
 
   <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="/assets/css/base.css" />
   <link rel="stylesheet" href="/assets/css/splash.css" />
 
   <style>
-    /* splash background image */
-    .splash{
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,.78)),
-        url("/assets/img/splash-studio.jpg") center / cover no-repeat fixed;
-    }
+    .splash-hero-wrap{margin:18px 0 8px; border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,.08);}
+    .splash-hero{display:block; width:100%; height:auto;}
   </style>
 </head>
-
 <body data-page="splash">
   <main class="splash">
     <section class="splash-inner" aria-label="Homepage">
       <div class="splash-top">
-        <div class="splash-mark">
-          &gt;&lt;(((°&gt; <span style="margin-left:10px;">LETFISHFUCK</span>
-        </div>
+        <div class="splash-mark">&gt;&lt;(((°&gt; <span style="margin-left:10px;">LETFISHFUCK</span></div>
         <div class="splash-sub">aka Mimi Marsh · living edge-board</div>
       </div>
 
-      <nav class="splash-actions" aria-label="Homepage links">
-        <a class="btn primary" href="/app/">ENTER HUB</a>
-        <a class="btn" href="/work/">WORK</a>
-        <a class="btn" href="/media/">MEDIA</a>
-        <a class="btn ghost" href="/playground/">PLAYGROUND</a>
-        <a class="btn ghost" href="/notes/">NOTES</a>
-        <a class="btn ghost" href="/crates/">CRATES</a>
-        <a class="btn" href="/contact/">CONTACT</a>
-      </nav>
-
-      <div class="fallback-chips" aria-label="Quick links">
-        <a href="/app/" class="chip">⚡ Hub</a>
-        <a href="/work/" class="chip">Work</a>
-        <a href="/media/" class="chip">Media</a>
-        <a href="/playground/" class="chip">Playground</a>
-        <a href="/notes/" class="chip">Notes</a>
-        <a href="/crates/" class="chip">Crates</a>
-        <a href="/contact/" class="chip">Contact</a>
+      <div class="splash-hero-wrap" aria-label="Studio photo">
+        <!-- Put the image at: /assets/img/splash.jpg -->
+        <img class="splash-hero" src="/assets/img/splash.jpg" alt="Mimi in the studio" loading="eager" />
       </div>
+
+      <nav class="splash-actions" aria-label="Homepage links">
+        <a class="btn primary" href="/app/">ENTER</a>
+        <a class="btn" href="/contact/">CONTACT</a>
+        <a class="btn ghost" href="/playground/">PLAYGROUND</a>
+      </nav>
 
       <div class="splash-note">
         <strong>Edge-board</strong>: throw sparks, prototypes, fragments, audio, weirdness — and let it grow.
