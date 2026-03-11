@@ -1,0 +1,55 @@
+[build]
+  base = "letfishfuck_site_v2"
+  publish = "."
+
+[[redirects]]
+  from = "/potraits"
+  to = "/portraits/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/potraits/*"
+  to = "/portraits/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/potrait"
+  to = "/portraits/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/potrait/*"
+  to = "/portraits/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/portrait"
+  to = "/portraits/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/portrait/*"
+  to = "/portraits/:splat"
+  status = 301
+  force = true
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/data/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
