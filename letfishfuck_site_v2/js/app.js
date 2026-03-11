@@ -6,7 +6,7 @@
   'use strict';
 
   // Build id (debug)
-  const LFF_BUILD = 'v19-drop-ready';
+  const LFF_BUILD = 'v20-single-engine-fix';
 
   // Namespace
   const LFF = (window.LFF = window.LFF || {});
@@ -166,6 +166,21 @@
     }
   }
 
+  function firstMediaHref(item) {
+    const media = normalizeMedia(item.media);
+    const first = media.find(Boolean);
+    if (!first) return '';
+    if (typeof first === 'string') {
+      return first.startsWith('/') ? normalizeInternalPath(first) : normalizeExternalLink(first);
+    }
+    if (typeof first === 'object') {
+      const srcRaw = first.src || first.url || '';
+      if (!srcRaw) return '';
+      return srcRaw.startsWith('/') ? normalizeInternalPath(srcRaw) : normalizeExternalLink(srcRaw);
+    }
+    return '';
+  }
+
   function renderSmartChips(item) {
     const chips = [];
     const addChip = (label, href, mode='auto') => {
@@ -175,24 +190,36 @@
         chips.push(`<span class="chip chip--disabled" aria-disabled="true">${escapeHtml(label)}</span>`);
         return;
       }
-      const target = (mode === 'newtab' || (mode === 'auto' && isExternal)) ? ` target="_blank" rel="noopener"` : '';
+      const target = (mode === 'newtab' || (mode === 'auto' && isExternal)) ? ` target="blank" rel="noopener"` : '';
       chips.push(`<a class="chip" href="${escapeHtml(safe)}"${target}>${escapeHtml(label)}</a>`);
     };
+
     const ph = item.playlist_hook || item.playlist || item.playlist_url;
     addChip('playlist', ph ? normalizeHookLink(ph, '/crates/') : '');
+
     const seed = item.track_seed || item.seed || item.track || '';
     addChip('seed', seed ? normalizeHookLink(seed, '/crates/') : '');
-    const file = item.file || item.filename || item.asset || '';
-    const fileHref = file ? (String(file).startsWith('/') || /^https?:\/\//i.test(String(file))
-      ? (String(file).startsWith('/') ? normalizeInternalPath(String(file)) : normalizeExternalLink(String(file)))
-      : `/media/${String(file)}`) : '';
+
+    const explicitFile = item.file || item.asset || item.path_to_file || '';
+    let fileHref = '';
+    if (explicitFile) {
+      fileHref = String(explicitFile).startsWith('/') || /^https?:\/\//i.test(String(explicitFile))
+        ? (String(explicitFile).startsWith('/') ? normalizeInternalPath(String(explicitFile)) : normalizeExternalLink(String(explicitFile)))
+        : `/media/${String(explicitFile)}`;
+    } else {
+      fileHref = firstMediaHref(item);
+      if (!fileHref && item.filename) {
+        fileHref = `/media/${String(item.filename)}`;
+      }
+    }
     addChip('file', fileHref);
+
     return `<div class="chips smart-chips">${chips.join(' ')}</div>`;
   }
 
   function cardHTML(item, kind) {
     const title = escapeHtml(item.title || '');
-    const desc  = escapeHtml(item.desc || '');
+    const desc  = escapeHtml(item.desc || item.description || '');
     const rawHref = (item.path || item.href || defaultHref(kind) || '').trim();
     const href = rawHref.startsWith('/') ? normalizeInternalPath(rawHref) : rawHref;
     const hrefAttr = href ? ` data-href="${escapeHtml(href)}" role="link" tabindex="0"` : '';
@@ -204,7 +231,7 @@
       const lh = lhRaw.startsWith('/') ? normalizeInternalPath(lhRaw) : normalizeExternalLink(lhRaw);
       const ll = escapeHtml((l && (l.label || l.title)) ? String(l.label || l.title) : 'link');
       const isExt = /^https?:\/\//i.test(lh);
-      const target = isExt ? ' target="_blank" rel="noopener"' : '';
+      const target = isExt ? ' target="blank" rel="noopener"' : '';
       return `<a class="chip-link" href="${escapeHtml(lh)}"${target}>${ll}</a>`;
     }).join('')}</div>` : '';
     return `<div class="card"${hrefAttr}><div class="card-title">${title}</div>${desc ? `<div class="card-desc">${desc}</div>` : ''}${renderSmartChips(item)}${linksHtml}${renderMedia(item.media)}${tagsHtml}</div>`;
@@ -455,6 +482,7 @@
       .subLinks a{ margin-right:12px; display:inline-block; }
       .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
       .chip{ display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.16); }
+      .chip--disabled{ opacity:.45; pointer-events:none; }
       .media-figure{ margin:10px 0 0; }
       .media-img{ max-width:100%; border-radius:12px; display:block; }
     `;
