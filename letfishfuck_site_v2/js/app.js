@@ -6,7 +6,7 @@
   'use strict';
 
   // Build id (debug)
-  const LFF_BUILD = 'v18-portraits-route-fix';
+  const LFF_BUILD = 'v19-drop-ready';
 
   // Namespace
   const LFF = (window.LFF = window.LFF || {});
@@ -17,10 +17,9 @@
   const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
   const escapeHTML = (str='') => String(str)
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    .replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
   const escapeHtml = escapeHTML;
 
-  // slug-ish filename helper (for iPad exports / sanity)
   function suggestedFilename(id, ext='png') {
     const safe = String(id || 'untitled')
       .trim()
@@ -32,7 +31,6 @@
   }
   LFF.suggestedFilename = suggestedFilename;
 
-  // Fetch JSON with sane errors
   async function getJSON(path) {
     const res = await fetch(path, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status} loading ${path}`);
@@ -40,11 +38,9 @@
   }
   LFF.getJSON = getJSON;
 
-  // Normalize external links so iOS doesn't choke on custom schemes (e.g., spotify:)
   function normalizeExternalLink(href) {
     let h = String(href || '').trim();
     if (!h) return '';
-    // Spotify app scheme -> https
     if (h.startsWith('spotify:')) {
       const parts = h.split(':');
       if (parts.length >= 3) {
@@ -53,12 +49,10 @@
         if (type && id) return `https://open.spotify.com/${type}/${id}`;
       }
     }
-    // Common "missing scheme" cases
     if (/^open\.spotify\.com\//i.test(h)) return 'https://' + h;
     if (/^spotify\.link\//i.test(h)) return 'https://' + h;
     if (/^soundcloud:\/\//i.test(h)) return h.replace(/^soundcloud:\/\//i, 'https://soundcloud.com/');
     if (/^https?:\/\//i.test(h)) return h;
-    // Looks like a domain? add https://
     if (/^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(h)) return 'https://' + h;
     return h;
   }
@@ -81,8 +75,6 @@
   }
   LFF.normalizeInternalPath = normalizeInternalPath;
 
-
-  // ---------- Partials include (header/footer) ----------
   async function includePartials() {
     const nodes = $$('[data-include]');
     if (!nodes.length) return;
@@ -100,28 +92,23 @@
   }
   LFF.includePartials = includePartials;
 
-  // ---------- Theme ----------
   const THEME_KEY = 'lff-theme';
   function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
   }
   function initTheme() {
-    // Dark default. Force dark and clear old saved pref.
     try { localStorage.removeItem(THEME_KEY); } catch(_) {}
     applyTheme("dark");
   }
   LFF.applyTheme = applyTheme;
 
-  // Convert custom hooks into clickable web-safe links (iOS hates unknown schemes).
   function normalizeHookLink(href, fallbackInternal='/crates/') {
     const h = String(href || '').trim();
     if (!h) return '';
-    // Our future custom scheme -> route through crates page.
     if (/^crate:\/\//i.test(h)) {
       return `${fallbackInternal}?hook=${encodeURIComponent(h)}`;
     }
-    // Spotify app URI forms like spotify://track/<id>
     if (/^spotify:\/\//i.test(h)) {
       const rest = h.replace(/^spotify:\/\//i, '');
       const parts = rest.split('/');
@@ -131,11 +118,10 @@
     return normalizeExternalLink(h);
   }
 
-  // ---------- Media rendering ----------
   function normalizeMedia(media) {
     if (!media) return [];
     if (Array.isArray(media)) return media;
-    return [media]; // backwards compat: single string
+    return [media];
   }
 
   function renderMedia(media) {
@@ -143,8 +129,7 @@
     if (!arr.length) return '';
     const items = arr.map((m) => {
       if (typeof m === 'string') {
-        const href = m;
-        return `<a class="chip" href="${escapeHTML(href)}" target="_blank" rel="noopener">media</a>`;
+        return `<a class="chip" href="${escapeHTML(m)}" target="_blank" rel="noopener">media</a>`;
       }
       if (m && typeof m === 'object') {
         const type = (m.type || 'link').toLowerCase();
@@ -153,10 +138,7 @@
         const title = m.title || m.label || type;
         if (!src) return '';
         if (type === 'image') {
-          return `<figure class="media-figure">
-            <img class="media-img" src="${escapeHTML(src)}" alt="${escapeHTML(title)}" loading="lazy" />
-            ${title ? `<figcaption class="small muted">${escapeHTML(title)}</figcaption>` : ''}
-          </figure>`;
+          return `<figure class="media-figure"><img class="media-img" src="${escapeHTML(src)}" alt="${escapeHTML(title)}" loading="lazy" />${title ? `<figcaption class="small muted">${escapeHTML(title)}</figcaption>` : ''}</figure>`;
         }
         return `<a class="chip" href="${escapeHTML(src)}" target="_blank" rel="noopener">${escapeHTML(title)}</a>`;
       }
@@ -165,7 +147,6 @@
     return `<div class="chips media-chips">${items}</div>`;
   }
 
-  // ---------- Cards ----------
   function defaultHref(kind) {
     switch (kind) {
       case 'note':
@@ -180,89 +161,53 @@
       case 'portrait':
       case 'portraits': return '/portraits/';
       case 'link':
-      case 'links': return ''; // external links should provide href
+      case 'links': return '';
       default: return '';
     }
   }
 
-  
   function renderSmartChips(item) {
     const chips = [];
-
     const addChip = (label, href, mode='auto') => {
       const safe = String(href || '').trim();
       const isExternal = /^https?:\/\//i.test(safe);
-
-      // disabled chip (fallback UI)
       if (!safe) {
         chips.push(`<span class="chip chip--disabled" aria-disabled="true">${escapeHtml(label)}</span>`);
         return;
       }
-
-      const target = (mode === 'newtab' || (mode === 'auto' && isExternal))
-        ? ` target="_blank" rel="noopener"`
-        : '';
+      const target = (mode === 'newtab' || (mode === 'auto' && isExternal)) ? ` target="_blank" rel="noopener"` : '';
       chips.push(`<a class="chip" href="${escapeHtml(safe)}"${target}>${escapeHtml(label)}</a>`);
     };
-
-    // playlist hook (can be crate://, spotify:, http(s), or internal)
     const ph = item.playlist_hook || item.playlist || item.playlist_url;
     addChip('playlist', ph ? normalizeHookLink(ph, '/crates/') : '');
-
-    // seed / track
     const seed = item.track_seed || item.seed || item.track || '';
     addChip('seed', seed ? normalizeHookLink(seed, '/crates/') : '');
-
-    // file (prefer explicit url, then /media/<filename>)
     const file = item.file || item.filename || item.asset || '';
-    const fileHref = file
-      ? (String(file).startsWith('/') || /^https?:\/\//i.test(String(file))
-          ? (String(file).startsWith('/') ? normalizeInternalPath(String(file)) : normalizeExternalLink(String(file)))
-          : `/media/${String(file)}`)
-      : '';
+    const fileHref = file ? (String(file).startsWith('/') || /^https?:\/\//i.test(String(file))
+      ? (String(file).startsWith('/') ? normalizeInternalPath(String(file)) : normalizeExternalLink(String(file)))
+      : `/media/${String(file)}`) : '';
     addChip('file', fileHref);
-
     return `<div class="chips smart-chips">${chips.join(' ')}</div>`;
   }
 
   function cardHTML(item, kind) {
     const title = escapeHtml(item.title || '');
     const desc  = escapeHtml(item.desc || '');
-
     const rawHref = (item.path || item.href || defaultHref(kind) || '').trim();
     const href = rawHref.startsWith('/') ? normalizeInternalPath(rawHref) : rawHref;
     const hrefAttr = href ? ` data-href="${escapeHtml(href)}" role="link" tabindex="0"` : '';
-
     const tags = Array.isArray(item.tags) ? item.tags : [];
-    const tagsHtml = tags.length
-      ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('')}</div>`
-      : '';
-
+    const tagsHtml = tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${escapeHtml(String(t))}</span>`).join('')}</div>` : '';
     const links = Array.isArray(item.links) ? item.links : [];
-    const linksHtml = links.length
-      ? `<div class="card-links">${links.map(l => {
-          const lhRaw = (l && l.href) ? String(l.href) : '';
-          const lh = lhRaw.startsWith('/') ? normalizeInternalPath(lhRaw) : normalizeExternalLink(lhRaw);
-          const ll = escapeHtml((l && (l.label || l.title)) ? String(l.label || l.title) : 'link');
-          const isExt = /^https?:\/\//i.test(lh);
-          const target = isExt ? ' target="_blank" rel="noopener"' : '';
-          return `<a class="chip-link" href="${escapeHtml(lh)}"${target}>${ll}</a>`;
-        }).join('')}</div>`
-      : '';
-
-    const mediaHtml = renderMedia(item.media);
-    const smart = renderSmartChips(item);
-
-    return `
-      <div class="card"${hrefAttr}>
-        <div class="card-title">${title}</div>
-        ${desc ? `<div class="card-desc">${desc}</div>` : ''}
-        ${smart}
-        ${linksHtml}
-        ${mediaHtml}
-        ${tagsHtml}
-      </div>
-    `;
+    const linksHtml = links.length ? `<div class="card-links">${links.map(l => {
+      const lhRaw = (l && l.href) ? String(l.href) : '';
+      const lh = lhRaw.startsWith('/') ? normalizeInternalPath(lhRaw) : normalizeExternalLink(lhRaw);
+      const ll = escapeHtml((l && (l.label || l.title)) ? String(l.label || l.title) : 'link');
+      const isExt = /^https?:\/\//i.test(lh);
+      const target = isExt ? ' target="_blank" rel="noopener"' : '';
+      return `<a class="chip-link" href="${escapeHtml(lh)}"${target}>${ll}</a>`;
+    }).join('')}</div>` : '';
+    return `<div class="card"${hrefAttr}><div class="card-title">${title}</div>${desc ? `<div class="card-desc">${desc}</div>` : ''}${renderSmartChips(item)}${linksHtml}${renderMedia(item.media)}${tagsHtml}</div>`;
   }
 
   function renderInto(container, items, kind) {
@@ -274,7 +219,6 @@
     container.innerHTML = items.map(it => cardHTML(it, kind)).join('');
   }
 
-  // ---------- Renderers ----------
   async function renderProjects(opts={}) {
     const container = $(opts.container || '#projectsList');
     try {
@@ -339,7 +283,6 @@
   LFF.renderNotes = renderNotes;
   LFF.renderPortraits = renderPortraits;
 
-  // ---------- Hub: "New Drop" ----------
   async function renderNewDrop() {
     const feed = $('#newDrop');
     if (!feed) return;
@@ -350,13 +293,11 @@
         getJSON('/data/notes.json').catch(() => []),
         getJSON('/data/portraits.json').catch(() => []),
       ]);
-
       const arr = []
         .concat(Array.isArray(projects)?projects:(projects.projects||[])).map(x=>({...x,_kind:'project'}))
         .concat(Array.isArray(experiments)?experiments:(experiments.experiments||[])).map(x=>({...x,_kind:'experiment'}))
         .concat(Array.isArray(notes)?notes:(notes.notes||[])).map(x=>({...x,_kind:'note'}))
         .concat(Array.isArray(portraits)?portraits:((portraits.cards||portraits.portraits||[]))).map(x=>({...x,_kind:'portrait'}));
-
       arr.sort((a,b) => String(b.date||'').localeCompare(String(a.date||'')));
       feed.innerHTML = arr.slice(0, 8).map(it => cardHTML(it, it._kind)).join('');
     } catch (e) {
@@ -364,7 +305,6 @@
     }
   }
 
-  // ---------- Crates ----------
   function renderCrates() {
     const url = 'https://mimis-music-genre--juice4.replit.app/crates';
     const open = document.getElementById('cratesOpen');
@@ -377,7 +317,6 @@
     if (frame) frame.setAttribute('src', url);
   }
 
-  // ---------- Draft UI gate ----------
   const IS_DRAFT = (() => {
     const sp = new URLSearchParams(location.search);
     if (sp.has('draft')) return true;
@@ -386,37 +325,26 @@
 
   function hideDraftUIIfNeeded() {
     if (IS_DRAFT) return;
-    const selectors = [
-      'input[type="file"]',
-      '#filePicker',
-      '#dropzone',
-      '.dropzone',
-      '.dz',
-      '.dz-wrap'
-    ];
+    const selectors = ['input[type="file"]','#filePicker','#dropzone','.dropzone','.dz','.dz-wrap'];
     document.querySelectorAll(selectors.join(',')).forEach((el) => {
       const container = el.closest('.dropzone, .dz, .dz-wrap, section, .card, .panel') || el;
       container.style.display = 'none';
     });
   }
 
-  // Ensure Crates link exists in nav
   function ensureCratesNavLink() {
     const navs = Array.from(document.querySelectorAll('nav'));
     for (const nav of navs) {
       const links = Array.from(nav.querySelectorAll('a'));
       if (!links.length) continue;
-
       const hasAny = links.some(a => ['work','about','contact','projects','experiments','links','notes'].some(k => (a.getAttribute('href')||'').includes(k)));
       const already = links.some(a => (a.getAttribute('href') || '') === '/crates/' || (a.textContent || '').trim().toLowerCase() === 'crates');
       if (!hasAny || already) continue;
-
       const base = links.find(a => (a.textContent || '').trim().length) || links[0];
       const a = document.createElement('a');
       a.href = '/crates/';
       a.textContent = 'Crates';
       if (base.className) a.className = base.className;
-
       const iconOnly = links.find(l => (l.textContent || '').trim().length === 0);
       if (iconOnly) nav.insertBefore(a, iconOnly);
       else nav.appendChild(a);
@@ -424,20 +352,16 @@
     }
   }
 
-  // ---------- Card click delegation (iOS-safe) ----------
   function wireCardClicks(root = document) {
     if (window.__LFF_cardsDelegated) return;
     window.__LFF_cardsDelegated = true;
-
     let lastNav = { href: '', t: 0 };
-
     const go = (href) => {
       if (!href) return;
       const h = String(href).trim();
       const now = Date.now();
       if (lastNav.href === h && (now - lastNav.t) < 600) return;
       lastNav = { href: h, t: now };
-
       const isExternal = /^https?:\/\//i.test(h);
       if (isExternal) {
         window.open(h, '_blank', 'noopener');
@@ -445,11 +369,9 @@
       }
       window.location.href = h;
     };
-
     const handler = (e) => {
       const card = e.target.closest('.card[data-href]');
       if (!card) return;
-
       const interactive = e.target.closest('a,button,input,textarea,select,label,[role="button"]');
       if (interactive && card.contains(interactive) && interactive !== card) {
         if (interactive.tagName === 'A') {
@@ -459,19 +381,15 @@
           return;
         }
       }
-
       const href = card.getAttribute('data-href');
       if (!href) return;
-
       e.preventDefault();
       e.stopPropagation();
       go(href);
     };
-
     root.addEventListener('click', handler, { passive: false, capture: true });
     root.addEventListener('touchend', handler, { passive: false, capture: true });
     root.addEventListener('pointerup', handler, { passive: false, capture: true });
-
     root.addEventListener('keydown', (e) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       const card = e.target.closest('.card[data-href]');
@@ -482,7 +400,6 @@
     }, true);
   }
 
-  // ---------- Page router ----------
   async function initByPage() {
     const page = document.body.getAttribute('data-page') || '';
     if (page === 'hub') {
@@ -501,21 +418,13 @@
     if (page === 'portraits' || page === 'cards') { await renderPortraits({container:'#portraitsList'}); return; }
   }
 
-  // ---------- Debug badge + self-test ----------
   function showDebugBadge() {
     const qs = new URLSearchParams(location.search);
     if (qs.get('debug') !== '1') return;
     const el = document.createElement('div');
     el.id = 'debugBadge';
     el.textContent = `LFF ${LFF_BUILD}`;
-    el.style.cssText = [
-      'position:fixed','right:10px','bottom:10px','z-index:9999',
-      'padding:6px 10px','border-radius:999px',
-      'font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial',
-      'background:rgba(0,0,0,.75)','color:#fff',
-      'border:1px solid rgba(255,255,255,.15)',
-      'backdrop-filter:saturate(140%) blur(6px)'
-    ].join(';');
+    el.style.cssText = ['position:fixed','right:10px','bottom:10px','z-index:9999','padding:6px 10px','border-radius:999px','font:12px/1.2 system-ui,-apple-system,Segoe UI,Roboto,Arial','background:rgba(0,0,0,.75)','color:#fff','border:1px solid rgba(255,255,255,.15)','backdrop-filter:saturate(140%) blur(6px)'].join(';');
     document.body.appendChild(el);
   }
 
@@ -524,13 +433,7 @@
     if (qs.get('debug') !== '1') return;
     const badge = $('#debugBadge');
     const report = [];
-    const probes = [
-      ['/data/projects.json','projects'],
-      ['/data/experiments.json','experiments'],
-      ['/data/links.json','links'],
-      ['/data/notes.json','notes'],
-      ['/data/portraits.json','portraits'],
-    ];
+    const probes = [['/data/projects.json','projects'],['/data/experiments.json','experiments'],['/data/links.json','links'],['/data/notes.json','notes'],['/data/portraits.json','portraits']];
     for (const [p, key] of probes) {
       try {
         const data = await getJSON(p);
@@ -558,7 +461,6 @@
     document.head.appendChild(s);
   }
 
-  // ---------- Boot ----------
   document.addEventListener('DOMContentLoaded', async () => {
     initTheme();
     injectLinkSpacingCSS();
